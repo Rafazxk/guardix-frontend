@@ -6,6 +6,9 @@ interface ModalAutenticacaoProps {
     onLoginSuccess?: () => void;
 }
 
+// Centraliza a URL da API (Ajuste para a sua variável de ambiente se usar Vite ou Next)
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:10000";
+
 function ModalAutenticacao({
     aberto,
     onFechar,
@@ -32,13 +35,19 @@ function ModalAutenticacao({
 
     const emailAtual = aba === "login" ? emailLogin : emailCadastro;
 
+    // Utilitário para alternar de aba limpando erros
+    const trocarAba = (novaAba: "login" | "cadastro") => {
+        setAba(novaAba);
+        setMensagemErro("");
+    };
+
     // 1. Envia a solicitação de código OTP para a API
     const solicitarCodigo = async (email: string) => {
         setCarregando(true);
         setMensagemErro("");
 
         try {
-            const resposta = await fetch("http://localhost:10000/verification/send", {
+            const resposta = await fetch(`${API_URL}/verification/send`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -53,7 +62,6 @@ function ModalAutenticacao({
                 throw new Error(dados.message || "Erro ao solicitar código de acesso.");
             }
 
-            // Muda a tela do modal para a digitação do código de 6 dígitos
             setEtapa("VERIFICACAO");
         } catch (erro: any) {
             setMensagemErro(erro.message || "Erro ao conectar com o servidor.");
@@ -64,35 +72,50 @@ function ModalAutenticacao({
 
     // 2. Valida o login com E-mail e Senha antes de enviar o OTP
     const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        setCarregando(true);
-        setMensagemErro("");
+    e.preventDefault();
+    setCarregando(true);
+    setMensagemErro("");
 
-        try {
-            // Valida as credenciais no backend
-            const respostaLogin = await fetch("http://localhost:10000/users/login", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    email: emailLogin,
-                    senha: senhaLogin,
-                }),
-            });
+    try {
+        const respostaLogin = await fetch(`${API_URL}/users/login`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                email: emailLogin,
+                senha: senhaLogin,
+            }),
+        });
 
-            const dadosLogin = await respostaLogin.json();
+        const dadosLogin = await respostaLogin.json();
 
-            if (!respostaLogin.ok) {
-                throw new Error(dadosLogin.message || "E-mail ou senha incorretos.");
+        if (!respostaLogin.ok) {
+            // Se o erro for especificamente e-mail não verificado, redireciona para o OTP
+            if (dadosLogin.message === "E-mail não verificado") {
+                await solicitarCodigo(emailLogin);
+                return;
             }
-
-            // Com as credenciais validadas, solicita o envio do código OTP por e-mail
-            await solicitarCodigo(emailLogin);
-
-        } catch (erro: any) {
-            setMensagemErro(erro.message || "Erro ao realizar login.");
-            setCarregando(false);
+            throw new Error(dadosLogin.message || "E-mail ou senha incorretos.");
         }
-    };
+
+        // Login realizado com sucesso! Armazena o JWT retornado pelo backend
+        if (dadosLogin.token) {
+            localStorage.setItem("guardix_token", dadosLogin.token);
+        }
+        if (dadosLogin.user) {
+            localStorage.setItem("guardix_user", JSON.stringify(dadosLogin.user));
+        }
+
+        if (onLoginSuccess) {
+            onLoginSuccess();
+        }
+
+        onFechar();
+    } catch (erro: any) {
+        setMensagemErro(erro.message || "Erro ao realizar login.");
+    } finally {
+        setCarregando(false);
+    }
+};
 
     // 3. Cadastra o novo usuário e aciona o envio do OTP
     const handleCadastro = async (e: FormEvent<HTMLFormElement>) => {
@@ -101,7 +124,7 @@ function ModalAutenticacao({
         setMensagemErro("");
 
         try {
-            const resposta = await fetch("http://192.168.0.7:10000/users/register", {
+            const resposta = await fetch(`${API_URL}/users/register`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -117,7 +140,6 @@ function ModalAutenticacao({
                 throw new Error(dados.message || "Erro ao criar conta.");
             }
 
-            // Após realizar o cadastro, aciona o envio de código OTP
             await solicitarCodigo(emailCadastro);
         } catch (erro: any) {
             setMensagemErro(erro.message || "Erro no processo de cadastro.");
@@ -132,7 +154,7 @@ function ModalAutenticacao({
         setMensagemErro("");
 
         try {
-            const resposta = await fetch("http://localhost:10000/verification/verify-email", {
+            const resposta = await fetch(`${API_URL}/verification/verify-email`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -147,7 +169,6 @@ function ModalAutenticacao({
                 throw new Error(dados.message || "Código inválido ou expirado.");
             }
 
-            // Salva a sessão no LocalStorage
             if (dados.token) {
                 localStorage.setItem("guardix_token", dados.token);
             } else {
@@ -158,7 +179,6 @@ function ModalAutenticacao({
                 localStorage.setItem("guardix_user", JSON.stringify(dados.user));
             }
 
-            // Atualiza o estado global da aplicação
             if (onLoginSuccess) {
                 onLoginSuccess();
             }
@@ -169,6 +189,12 @@ function ModalAutenticacao({
         } finally {
             setCarregando(false);
         }
+    };
+
+    const handleVoltarFormulario = () => {
+        setEtapa("FORM");
+        setCodigo("");
+        setMensagemErro("");
     };
 
     return (
@@ -196,7 +222,6 @@ function ModalAutenticacao({
                 )}
 
                 {etapa === "VERIFICACAO" ? (
-                    /* FORMULÁRIO DE CONFIRMAÇÃO DO CÓDIGO (OTP) */
                     <form onSubmit={handleConfirmarCodigo} className="flex flex-col gap-4">
                         <h3 className="text-xl font-bold text-white">Verificação de E-mail</h3>
                         <p className="text-sm text-slate-400">
@@ -223,19 +248,18 @@ function ModalAutenticacao({
 
                         <button
                             type="button"
-                            onClick={() => setEtapa("FORM")}
-                            className="text-sm text-slate-400 hover:underline"
+                            onClick={handleVoltarFormulario}
+                            className="text-sm text-slate-400 hover:underline text-center mt-1"
                         >
                             Voltar e alterar e-mail
                         </button>
                     </form>
                 ) : (
-                    /* FORMULÁRIOS DE LOGIN E CADASTRO */
                     <>
                         <div className="mb-6 flex gap-6 border-b border-slate-700">
                             <button
                                 type="button"
-                                onClick={() => setAba("login")}
+                                onClick={() => trocarAba("login")}
                                 className={`border-b-2 pb-2 font-semibold transition-all duration-300 ${
                                     aba === "login"
                                         ? "border-blue-500 text-blue-500"
@@ -246,7 +270,7 @@ function ModalAutenticacao({
                             </button>
                             <button
                                 type="button"
-                                onClick={() => setAba("cadastro")}
+                                onClick={() => trocarAba("cadastro")}
                                 className={`border-b-2 pb-2 font-semibold transition-all duration-300 ${
                                     aba === "cadastro"
                                         ? "border-blue-500 text-blue-500"
