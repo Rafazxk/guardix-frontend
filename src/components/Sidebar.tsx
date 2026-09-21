@@ -19,7 +19,6 @@ function Sidebar({
     setMenuAberto,
     secaoAtiva,
     navegar,
-    abrirModalPro,
     abrirModalReporte,
     usuario,
 }: SidebarProps) {
@@ -160,8 +159,20 @@ function Sidebar({
                     <i className="fas fa-triangle-exclamation w-4 text-center"></i>
                     <span>Denunciar Golpe</span>
                 </a>
-            </nav>
-
+            
+            <a
+                href="#"
+                className={`${itemBase} ${secaoAtiva === "planos" ? itemAtivo : ""}`}
+                onClick={(e) => {
+                    e.preventDefault();
+                    navegar("planos");
+                }}
+            >
+                <i className="fas fa-star"></i>
+                <span>Acessar Planos</span>
+            </a>
+         </nav>
+         
             {/* RODAPÉ DO USUÁRIO */}
             <div className="shrink-0 flex items-center gap-3 border-t border-slate-800 px-3 pt-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
                 <div className="flex min-w-0 flex-1 items-center gap-2.5">

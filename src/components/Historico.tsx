@@ -19,7 +19,7 @@ interface HistoricoProps {
 
 function Historico({
     historicoInicial,
-    apiUrl = "http://192.168.0.9:10000/api/historico"
+    apiUrl = "http://localhost:10000/api/historico"
 }: HistoricoProps) {
     const [historico, setHistorico] = useState<HistoricoItem[]>(historicoInicial || []);
     const [carregando, setCarregando] = useState<boolean>(!historicoInicial);

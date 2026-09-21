@@ -14,7 +14,7 @@ interface RelatoriosProps {
 }
 
 function Relatorios({
-    apiUrl = "http://192.168.0.9:10000/stats/estatisticas",
+    apiUrl = "http://localhost:10000/stats/estatisticas",
     onUpgradePro,
 }: RelatoriosProps) {
     const [stats, setStats] = useState<EstatisticasUsuario>({

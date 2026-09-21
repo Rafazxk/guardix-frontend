@@ -5,6 +5,7 @@ import Verificador from "../components/Verificador";
 import Historico from "../components/Historico";
 import FeedGolpes from "../components/FeedGolpes";
 import Relatorios from "../components/Relatorios";
+import Planos from "../components/planos/Planos";
 import ModalPro from "../components/ModalPro";
 import ModalReport from "../components/ModalReport";
 
@@ -27,9 +28,9 @@ function Guardix({ onLogout }: GuardixProps) {
         const token = localStorage.getItem("guardix_token");
 
         if (!token) {
-            onLogout();
+           onLogout();
             return;
-        }
+       }
 
         if (dadosSalvos) {
             setUsuarioLogado(JSON.parse(dadosSalvos));
@@ -103,6 +104,10 @@ function Guardix({ onLogout }: GuardixProps) {
                    <Relatorios />
                 )}
 
+                {secaoAtiva === "planos" && (
+                    <Planos />
+                )}
+                
                 {secaoAtiva === "pro" && (
                     <ModalPro 
                         onClose={() => setModalProAberto(false)}

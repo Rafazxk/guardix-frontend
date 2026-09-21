@@ -13,6 +13,13 @@ function Home({ onLoginSuccess }: HomeProps) {
     const abrirModal = () => setModalAutenticacaoAberto(true);
     const fecharModal = () => setModalAutenticacaoAberto(false);
 
+    const handleLoginSuccess = () => {
+        fecharModal();
+        if (onLoginSuccess) {
+            onLoginSuccess();
+        }
+    };
+
     return (
         <div className="min-h-screen bg-slate-950 text-slate-100 selection:bg-blue-500 selection:text-white">
 
@@ -91,7 +98,7 @@ function Home({ onLoginSuccess }: HomeProps) {
             <ModalAutenticacao
                 aberto={modalAutenticacaoAberto}
                 onFechar={fecharModal}
-                onLoginSuccess={onLoginSuccess} 
+                onLoginSuccess={handleLoginSuccess} 
             />
 
         </div>
