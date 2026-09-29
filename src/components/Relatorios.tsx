@@ -262,50 +262,12 @@ function Relatorios({
 
         {/* RESUMO DE SEGURANÇA */}
         <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-lg">
-          <div className="mb-6 flex items-center justify-between">
-            <div>
-              <h2 className="text-lg font-semibold text-slate-100">
-                Resumo de segurança
-              </h2>
-
-              <p className="mt-1 text-sm text-slate-400">
-                Uma visão geral dos resultados encontrados.
-              </p>
-            </div>
-
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-yellow-500/10 text-yellow-400">
-              <i className="fas fa-gauge-high" />
-            </div>
-          </div>
 
           <div className="space-y-4">
-            <div className="flex items-center justify-between rounded-xl border border-slate-800 bg-slate-950/40 p-4">
-              <div className="flex items-center gap-3">
-                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-yellow-500/10 text-yellow-400">
-                  <i className="fas fa-gauge-high" />
-                </div>
-
-                <div>
-                  <p className="text-sm font-medium text-slate-200">
-                    Nível médio de risco
-                  </p>
-
-                  <p className="text-xs text-slate-500">
-                    Baseado nas suas análises
-                  </p>
-                </div>
-              </div>
-
-              <span className="rounded-full border border-yellow-500/20 bg-yellow-500/10 px-3 py-1 text-xs font-semibold text-yellow-400">
-                {carregando ? "..." : stats.risco_medio}
-              </span>
-            </div>
 
             <div className="flex items-center justify-between rounded-xl border border-slate-800 bg-slate-950/40 p-4">
               <div className="flex items-center gap-3">
-                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-red-500/10 text-red-400">
-                  <i className="fas fa-flag" />
-                </div>
+               
 
                 <div>
                   <p className="text-sm font-medium text-slate-200">
@@ -325,37 +287,167 @@ function Relatorios({
           </div>
         </div>
       </div>
-
-      {/* ATIVIDADE PRO */}
-      <div className="mt-6 overflow-hidden rounded-2xl border border-indigo-500/20 bg-gradient-to-br from-indigo-500/10 via-slate-900/80 to-slate-900/80 p-8 text-center shadow-lg">
-        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-500/10 text-indigo-400">
-          <i className="fas fa-chart-line text-2xl" />
+{/* PRÉVIA DO RELATÓRIO PRO */}
+<div className="mt-6 overflow-hidden rounded-2xl border border-indigo-500/20 bg-gradient-to-br from-indigo-500/10 via-slate-900/80 to-slate-900/80 p-6 shadow-lg">
+  <div className="mb-6 flex items-start justify-between gap-4">
+    <div>
+      <div className="flex items-center gap-2">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-400">
+          <i className="fas fa-chart-line" />
         </div>
 
-        <h2 className="mt-4 text-lg font-semibold text-slate-100">
-          Atividade de segurança
-        </h2>
+        <div>
+          <h2 className="text-lg font-semibold text-slate-100">
+            Relatório detalhado
+          </h2>
 
-        <p className="mx-auto mt-2 max-w-md text-sm text-slate-400">
-          Acompanhe a evolução das suas análises e identifique
-          padrões de segurança ao longo do tempo.
-        </p>
-
-        <div className="mt-4 flex items-center justify-center gap-2 text-xs text-slate-500">
-          <i className="fas fa-lock" />
-          Disponível no Plano Pro
+          <p className="mt-1 text-sm text-slate-400">
+            Descubra padrões nas suas análises de segurança.
+          </p>
         </div>
-
-        {/* BOTÃO DESBLOQUEAR QUE ABRE A MODAL */}
-        <button
-          type="button"
-          className="btn-outline-indigo mt-5"
-          onClick={() => setModalProAberto(true)}
-        >
-          Desbloquear
-          <i className="fas fa-arrow-right ml-2" />
-        </button>
       </div>
+    </div>
+
+    <span className="rounded-full border border-indigo-500/20 bg-indigo-500/10 px-3 py-1 text-xs font-semibold text-indigo-400">
+      PRO
+    </span>
+  </div>
+
+  {/* PRÉVIA DOS DADOS */}
+  <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+    {/* EVOLUÇÃO */}
+    <div className="rounded-xl border border-slate-800 bg-slate-950/50 p-4">
+      <div className="mb-4 flex items-center gap-2">
+        <i className="fas fa-chart-line text-indigo-400" />
+        <span className="text-sm font-medium text-slate-200">
+          Evolução
+        </span>
+      </div>
+
+      <div className="flex h-20 items-end gap-2">
+        <div className="h-8 flex-1 rounded-t bg-indigo-500/30" />
+        <div className="h-12 flex-1 rounded-t bg-indigo-500/40" />
+        <div className="h-6 flex-1 rounded-t bg-indigo-500/30" />
+        <div className="h-16 flex-1 rounded-t bg-indigo-500/50" />
+        <div className="h-11 flex-1 rounded-t bg-indigo-500/40" />
+        <div className="h-20 flex-1 rounded-t bg-indigo-500/60" />
+      </div>
+
+      <p className="mt-3 text-xs text-slate-500">
+        Análises realizadas ao longo do tempo
+      </p>
+    </div>
+
+    {/* DISTRIBUIÇÃO DE RISCO */}
+    <div className="rounded-xl border border-slate-800 bg-slate-950/50 p-4">
+      <div className="mb-4 flex items-center gap-2">
+        <i className="fas fa-chart-pie text-yellow-400" />
+        <span className="text-sm font-medium text-slate-200">
+          Distribuição de risco
+        </span>
+      </div>
+
+      <div className="space-y-3">
+        <div>
+          <div className="mb-1 flex justify-between text-xs">
+            <span className="text-slate-400">Seguro</span>
+            <span className="text-slate-500">—</span>
+          </div>
+
+          <div className="h-2 rounded-full bg-slate-800">
+            <div className="h-full w-3/5 rounded-full bg-green-500/50" />
+          </div>
+        </div>
+
+        <div>
+          <div className="mb-1 flex justify-between text-xs">
+            <span className="text-slate-400">Médio risco</span>
+            <span className="text-slate-500">—</span>
+          </div>
+
+          <div className="h-2 rounded-full bg-slate-800">
+            <div className="h-full w-2/5 rounded-full bg-yellow-500/50" />
+          </div>
+        </div>
+
+        <div>
+          <div className="mb-1 flex justify-between text-xs">
+            <span className="text-slate-400">Alto risco</span>
+            <span className="text-slate-500">—</span>
+          </div>
+
+          <div className="h-2 rounded-full bg-slate-800">
+            <div className="h-full w-1/4 rounded-full bg-red-500/50" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {/* PADRÕES */}
+    <div className="rounded-xl border border-slate-800 bg-slate-950/50 p-4">
+      <div className="mb-4 flex items-center gap-2">
+        <i className="fas fa-magnifying-glass-chart text-red-400" />
+        <span className="text-sm font-medium text-slate-200">
+          Padrões detectados
+        </span>
+      </div>
+
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <span className="text-xs text-slate-400">
+            Regras acionadas
+          </span>
+          <span className="text-sm font-semibold text-slate-500">
+            —
+          </span>
+        </div>
+
+        <div className="flex items-center justify-between">
+          <span className="text-xs text-slate-400">
+            Ameaças encontradas
+          </span>
+          <span className="text-sm font-semibold text-slate-500">
+            —
+          </span>
+        </div>
+
+        <div className="flex items-center justify-between">
+          <span className="text-xs text-slate-400">
+            Período de maior atividade
+          </span>
+          <span className="text-sm font-semibold text-slate-500">
+            —
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {/* BLOQUEIO */}
+  <div className="mt-6 rounded-xl border border-indigo-500/10 bg-indigo-500/5 p-5 text-center">
+    <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-400">
+      <i className="fas fa-lock" />
+    </div>
+
+    <h3 className="mt-3 text-sm font-semibold text-slate-200">
+      Relatório completo disponível no Plano Pro
+    </h3>
+
+    <p className="mx-auto mt-2 max-w-lg text-xs leading-5 text-slate-500">
+      Tenha acesso à evolução das suas análises, distribuição de riscos,
+      padrões detectados e histórico detalhado das suas verificações.
+    </p>
+
+    <button
+      type="button"
+      className="btn-outline-indigo mt-4"
+      onClick={() => setModalProAberto(true)}
+    >
+      Conhecer o Plano Pro
+      <i className="fas fa-arrow-right ml-2" />
+    </button>
+  </div>
+</div>
 
       {/* MODAL PRO */}
       {modalProAberto && (
