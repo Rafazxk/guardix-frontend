@@ -72,93 +72,95 @@ function Verificador({
     };
 
     const handleSubmit = async (e: FormEvent) => {
-        e.preventDefault();
+    e.preventDefault();
 
-        if (consultasRealizadas >= limiteCota) {
-            onAbrirModalPro();
-            return;
+    if (consultasRealizadas >= limiteCota) {
+        onAbrirModalPro();
+        return;
+    }
+
+    if (!link && !telefone && !arquivo) {
+        setErro("Preencha ao menos um campo.");
+        return;
+    }
+
+    setErro("");
+    setResultado(null);
+    setCarregando(true);
+
+    const token = localStorage.getItem("guardix_token");
+
+    // Validação local prévia
+    if (!token) {
+        setErro("Sessão expirada ou não autenticada. Faça login novamente.");
+        setCarregando(false);
+        return;
+    }
+
+    try {
+        let response: Response;
+        const headers = {
+            Authorization: `Bearer ${token}`,
+        };
+
+        if (arquivo) {
+            const formData = new FormData();
+            formData.append("imagem", arquivo);
+
+            response = await fetch("http://localhost:10000/api/print", {
+                method: "POST",
+                headers,
+                body: formData,
+            });
+        } else if (link) {
+            response = await fetch("http://localhost:10000/api/link", {
+                method: "POST",
+                headers: {
+                    ...headers,
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ url: link }),
+            });
+        } else {
+            response = await fetch("http://localhost:10000/api/phone", {
+                method: "POST",
+                headers: {
+                    ...headers,
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ numero: telefone }),
+            });
         }
 
-        if (!link && !telefone && !arquivo) {
-            setErro("Preencha ao menos um campo.");
-            return;
+        // Tenta fazer o parse do JSON enviado pela API (mesmo para códigos de erro HTTP)
+        const data = await response.json().catch(() => null);
+
+        // Trata erro 401: Token Inválido / Expirado
+        if (response.status === 401) {
+            throw new Error(data?.error || data?.mensagem || "Sessão expirada. Faça login novamente.");
         }
 
-        setErro("");
-        setResultado(null);
-        setCarregando(true);
-
-        const token = localStorage.getItem("guardix_token");
-
-        try {
-            let response: Response;
-            const headers = {
-                Authorization: `Bearer ${token}`,
-            };
-
-            if (arquivo) {
-                const formData = new FormData();
-                formData.append("imagem", arquivo);
-
-                response = await fetch(
-                    "http://192.168.0.9:10000/api/print",
-                    {
-                        method: "POST",
-                        headers,
-                        body: formData,
-                    }
-                );
-            } else if (link) {
-                response = await fetch(
-                    "http://192.168.0.9:10000/api/link",
-                    {
-                        method: "POST",
-                        headers: {
-                            ...headers,
-                            "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify({
-                            url: link,
-                        }),
-                    }
-                );
-            } else {
-                response = await fetch(
-                    "http://192.168.0.9:10000/api/phone",
-                    {
-                        method: "POST",
-                        headers: {
-                            ...headers,
-                            "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify({
-                            numero: telefone,
-                        }),
-                    }
-                );
-            }
-
-            if (!response.ok) {
-                throw new Error("Erro na resposta do servidor.");
-            }
-
-            const data = await response.json();
-
-            if (data.error) {
-                throw new Error(data.error);
-            }
-
-            setResultado(data);
-        } catch (error) {
-            setErro(
-                error instanceof Error
-                    ? error.message
-                    : "Erro ao realizar análise."
-            );
-        } finally {
-            setCarregando(false);
+        // Trata erro 403: Cota do Plano Atingida
+        if (response.status === 403) {
+            onAbrirModalPro(); // Abre o modal de upgrade automaticamente
+            throw new Error(data?.error || data?.mensagem || "Limite de consultas diárias atingido.");
         }
-    };
+
+        if (!response.ok) {
+            throw new Error(data?.error || data?.mensagem || `Erro no servidor (${response.status})`);
+        }
+
+        setResultado(data);
+    } catch (error) {
+        setErro(
+            error instanceof Error
+                ? error.message
+                : "Erro ao realizar análise."
+        );
+    } finally {
+        setCarregando(false);
+    }
+};
 
     const rawScore = resultado?.score ?? 0;
     const score = Math.min(rawScore, 100);

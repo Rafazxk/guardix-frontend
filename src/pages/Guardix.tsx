@@ -24,18 +24,18 @@ function Guardix({ onLogout }: GuardixProps) {
     const [usuarioLogado, setUsuarioLogado] = useState<any>(undefined);
 
     useEffect(() => {
-        const dadosSalvos = localStorage.getItem("guardix_user");
-        const token = localStorage.getItem("guardix_token");
+    const dadosSalvos = localStorage.getItem("guardix_user");
+    const token = localStorage.getItem("guardix_token");
 
-        if (!token) {
-           onLogout();
-            return;
-       }
+    if (!token) {
+        onLogout();
+        return;
+    }
 
-        if (dadosSalvos) {
-            setUsuarioLogado(JSON.parse(dadosSalvos));
-        }
-    }, [onLogout]);
+    if (dadosSalvos) {
+        setUsuarioLogado(JSON.parse(dadosSalvos));
+    }
+}, []);
 
     const navegar = (secao: string) => {
         setSecaoAtiva(secao);
@@ -117,56 +117,9 @@ function Guardix({ onLogout }: GuardixProps) {
             </main>
 
             {modalProAberto && (
-                <div
-                    className="modal-overlay"
-                    onClick={() => setModalProAberto(false)}
-                >
-                    <div
-                        className="modal-box"
-                        onClick={(e) => e.stopPropagation()}
-                    >
-                        <button
-                            className="modal-close"
-                            onClick={() => setModalProAberto(false)}
-                        >
-                            <i className="fas fa-times"></i>
-                        </button>
+    <ModalPro onClose={() => setModalProAberto(false)} />
+)}
 
-                        <div className="modal-badge">
-                            PRO
-                        </div>
-
-                        <h3 className="modal-title">
-                            Recurso Exclusivo Pro
-                        </h3>
-
-                        <p className="modal-text">
-                            Esta funcionalidade está disponível
-                            apenas para assinantes do plano Pro.
-                        </p>
-
-                        <button
-                            className="btn-pro-cta"
-                            onClick={() => {
-                                console.log("Assinar Pro");
-                            }}
-                        >
-                            Assinar Agora — R$ 29,90/mês
-                        </button>
-
-                        <button
-                            className="btn-modal-cancel"
-                            onClick={() =>
-                                setModalProAberto(false)
-                            }
-                        >
-                            Talvez depois
-                        </button>
-                    </div>
-                </div>
-            )}
-
-            
             <ModalReport 
                 isOpen={modalReporteAberto} 
                 onClose={() => setModalReporteAberto(false)} 

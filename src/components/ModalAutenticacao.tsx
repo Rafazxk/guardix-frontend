@@ -137,7 +137,7 @@ function ModalAutenticacao({
             const dados = await resposta.json();
 
             if (!resposta.ok) {
-                throw new Error(dados.message || "Erro ao criar conta.");
+                throw new Error(dados.message || "Essa conta ja existe.");
             }
 
             await solicitarCodigo(emailCadastro);
@@ -149,47 +149,66 @@ function ModalAutenticacao({
 
     // 4. Confirma o código digitado e valida a autenticação final
     const handleConfirmarCodigo = async (e: FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        setCarregando(true);
-        setMensagemErro("");
+    e.preventDefault();
+    setCarregando(true);
+    setMensagemErro("");
 
-        try {
-            const resposta = await fetch(`${API_URL}/verification/verify-email`, {
+    try {
+        const resposta = await fetch(`${API_URL}/verification/verify-email`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                email: emailAtual,
+                code: codigo,
+            }),
+        });
+
+        const dados = await resposta.json();
+
+        if (!resposta.ok) {
+            throw new Error(dados.message || "Código inválido ou expirado.");
+        }
+
+        // Procura a propriedade token do backend (token ou accessToken)
+        const jwtToken = dados.token || dados.accessToken;
+
+        if (jwtToken) {
+            localStorage.setItem("guardix_token", jwtToken);
+        } else {
+            // Se a rota de verificação não gera token automaticamente, 
+            // dispara o login com email e senha para obter um JWT válido.
+            const loginResp = await fetch(`${API_URL}/users/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     email: emailAtual,
-                    code: codigo,
+                    senha: aba === "login" ? senhaLogin : senhaCadastro,
                 }),
             });
+            const loginDados = await loginResp.json();
 
-            const dados = await resposta.json();
-
-            if (!resposta.ok) {
-                throw new Error(dados.message || "Código inválido ou expirado.");
-            }
-
-            if (dados.token) {
-                localStorage.setItem("guardix_token", dados.token);
+            if (loginResp.ok && (loginDados.token || loginDados.accessToken)) {
+                localStorage.setItem("guardix_token", loginDados.token || loginDados.accessToken);
             } else {
-                localStorage.setItem("guardix_token", "authenticated");
+                throw new Error("Erro ao obter o token de acesso. Faça login manualmente.");
             }
-
-            if (dados.user) {
-                localStorage.setItem("guardix_user", JSON.stringify(dados.user));
-            }
-
-            if (onLoginSuccess) {
-                onLoginSuccess();
-            }
-
-            onFechar();
-        } catch (erro: any) {
-            setMensagemErro(erro.message || "Falha na validação do código.");
-        } finally {
-            setCarregando(false);
         }
-    };
+
+        if (dados.user) {
+            localStorage.setItem("guardix_user", JSON.stringify(dados.user));
+        }
+
+        if (onLoginSuccess) {
+            onLoginSuccess();
+        }
+
+        onFechar();
+    } catch (erro: any) {
+        setMensagemErro(erro.message || "Falha na validação do código.");
+    } finally {
+        setCarregando(false);
+    }
+};
 
     const handleVoltarFormulario = () => {
         setEtapa("FORM");
@@ -387,3 +406,4 @@ function ModalAutenticacao({
 }
 
 export default ModalAutenticacao;
+
