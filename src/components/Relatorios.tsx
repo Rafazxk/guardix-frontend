@@ -5,8 +5,7 @@ interface EstatisticasUsuario {
   total_consultas: number | string;
   ameacas_evitadas: number | string;
   analises_seguras: number | string;
-  risco_medio: string | number;
-  reportados: number | string;
+  total_reportados: number | string;
 }
 
 interface RelatoriosProps {
@@ -14,22 +13,47 @@ interface RelatoriosProps {
   onUpgradePro?: () => void;
 }
 
+interface RelatorioPremium {
+  evolucao: {
+    data: string;
+    total: number | string;
+  }[];
+
+  distribuicao_risco: {
+    risco: "alto" | "medio" | "baixo";
+    total: number | string;
+  }[];
+
+  tipos_analise: {
+    tipo_consulta: string;
+    total: number | string;
+  }[];
+}
+
 function Relatorios({
   apiUrl = "http://localhost:10000/stats/estatisticas",
   onUpgradePro,
 }: RelatoriosProps) {
+
   const [stats, setStats] = useState<EstatisticasUsuario>({
     total_consultas: "—",
     ameacas_evitadas: "—",
     analises_seguras: "—",
-    risco_medio: "—",
-    reportados: "—",
+    total_reportados: "—",
   });
 
   const [carregando, setCarregando] = useState<boolean>(true);
   const [erro, setErro] = useState<string | null>(null);
-  
-  // Estado para controlar a visibilidade do ModalPro nesta página
+
+  const [relatorioPremium, setRelatorioPremium] =
+    useState<RelatorioPremium | null>(null);
+
+  const [carregandoPremium, setCarregandoPremium] =
+    useState<boolean>(true);
+
+  const [erroPremium, setErroPremium] =
+    useState<string | null>(null)
+
   const [modalProAberto, setModalProAberto] = useState<boolean>(false);
 
   useEffect(() => {
@@ -60,13 +84,12 @@ function Relatorios({
           total_consultas: data.total_consultas ?? 0,
           ameacas_evitadas: data.ameacas_evitadas ?? 0,
           analises_seguras: data.analises_seguras ?? 0,
-          risco_medio: data.risco_medio ?? "Baixo",
-          reportados: data.reportados ?? 0,
+          total_reportados: data.total_reportados ?? 0,
         });
       } catch (err: any) {
         setErro(
           err.message ||
-            "Erro desconhecido ao carregar suas estatísticas."
+          "Erro desconhecido ao carregar suas estatísticas."
         );
       } finally {
         setCarregando(false);
@@ -76,10 +99,58 @@ function Relatorios({
     buscarEstatisticas();
   }, [apiUrl]);
 
+  useEffect(() => {
+    const buscarRelatorioPremium = async () => {
+      setCarregandoPremium(true);
+      setErroPremium(null);
+
+      try {
+        const token = localStorage.getItem("guardix_token");
+
+        const response = await fetch(
+          "http://localhost:10000/stats/relatorio",
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: token ? `Bearer ${token}` : "",
+            },
+          }
+        );
+
+      if (response.status === 403) {
+  setRelatorioPremium(null);
+  return;
+}
+
+if (!response.ok) {
+  throw new Error(
+    "Não foi possível carregar o relatório avançado."
+  );
+}
+        const data = await response.json();
+
+        setRelatorioPremium(data);
+      } catch (err: any) {
+        setErroPremium(
+          err.message ||
+          "Erro ao carregar o relatório avançado."
+        );
+      } finally {
+        setCarregandoPremium(false);
+      }
+    };
+
+    buscarRelatorioPremium();
+  }, []);
+
   const totalConsultas = Number(stats.total_consultas) || 0;
   const ameacasIdentificadas = Number(stats.ameacas_evitadas) || 0;
   const analisesSeguras = Number(stats.analises_seguras) || 0;
-  const denuncias = Number(stats.reportados) || 0;
+  const denuncias = Number(stats.total_reportados) || 0;
+
+const temAcessoPremium =
+  !carregandoPremium && relatorioPremium !== null;
 
   const handleIrParaPlanos = () => {
     setModalProAberto(false);
@@ -218,9 +289,9 @@ function Relatorios({
                   width:
                     totalConsultas > 0
                       ? `${Math.min(
-                          (analisesSeguras / totalConsultas) * 100,
-                          100
-                        )}%`
+                        (analisesSeguras / totalConsultas) * 100,
+                        100
+                      )}%`
                       : "0%",
                 }}
               />
@@ -250,9 +321,9 @@ function Relatorios({
                   width:
                     totalConsultas > 0
                       ? `${Math.min(
-                          (ameacasIdentificadas / totalConsultas) * 100,
-                          100
-                        )}%`
+                        (ameacasIdentificadas / totalConsultas) * 100,
+                        100
+                      )}%`
                       : "0%",
                 }}
               />
@@ -267,7 +338,7 @@ function Relatorios({
 
             <div className="flex items-center justify-between rounded-xl border border-slate-800 bg-slate-950/40 p-4">
               <div className="flex items-center gap-3">
-               
+
 
                 <div>
                   <p className="text-sm font-medium text-slate-200">
@@ -287,155 +358,265 @@ function Relatorios({
           </div>
         </div>
       </div>
-{/* PRÉVIA DO RELATÓRIO PRO */}
-<div className="mt-6 overflow-hidden rounded-2xl border border-indigo-500/20 bg-gradient-to-br from-indigo-500/10 via-slate-900/80 to-slate-900/80 p-6 shadow-lg">
-  <div className="mb-6 flex items-start justify-between gap-4">
-    <div>
-      <div className="flex items-center gap-2">
-        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-400">
-          <i className="fas fa-chart-line" />
+
+      {/* PRÉVIA DO RELATÓRIO PRO */}
+      <div className="mt-6 overflow-hidden rounded-2xl border border-indigo-500/20 bg-gradient-to-br from-indigo-500/10 via-slate-900/80 to-slate-900/80 p-6 shadow-lg">
+        <div className="mb-6 flex items-start justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-400">
+                <i className="fas fa-chart-line" />
+              </div>
+
+              <div>
+                <h2 className="text-lg font-semibold text-slate-100">
+                  Relatório detalhado
+                </h2>
+
+                <p className="mt-1 text-sm text-slate-400">
+                  Descubra padrões nas suas análises de segurança.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <span className="rounded-full border border-indigo-500/20 bg-indigo-500/10 px-3 py-1 text-xs font-semibold text-indigo-400">
+            PRO
+          </span>
         </div>
 
-        <div>
-          <h2 className="text-lg font-semibold text-slate-100">
-            Relatório detalhado
-          </h2>
+        {/* PRÉVIA DOS DADOS */}
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
 
-          <p className="mt-1 text-sm text-slate-400">
-            Descubra padrões nas suas análises de segurança.
-          </p>
-        </div>
-      </div>
+          {/* EVOLUÇÃO */}
+          <div className="rounded-xl border border-slate-800 bg-slate-950/50 p-4">
+            <div className="mb-4 flex items-center gap-2">
+              <i className="fas fa-chart-line text-indigo-400" />
+              <span className="text-sm font-medium text-slate-200">
+                Evolução
+              </span>
+            </div>
+
+            <div className="flex h-20 items-end gap-2">
+              {carregandoPremium ? (
+                <div className="flex h-full w-full items-center justify-center">
+                  <span className="text-xs text-slate-500">
+                    Carregando...
+                  </span>
+                </div>
+              ) : relatorioPremium?.evolucao.length ? (
+                relatorioPremium.evolucao.map((item) => {
+                  const total = Number(item.total) || 0;
+
+                  const maiorTotal = Math.max(
+                    ...relatorioPremium.evolucao.map(
+                      (item) => Number(item.total) || 0
+                    ),
+                    1
+                  );
+
+                  const altura = Math.max(
+                    (total / maiorTotal) * 80,
+                    8
+                  );
+
+                  return (
+                    <div
+                      key={item.data}
+                      className="flex flex-1 flex-col items-center justify-end gap-1"
+                    >
+                      <span className="text-[10px] text-slate-500">
+                        {total}
+                      </span>
+
+                      <div
+                        className="w-full rounded-t bg-indigo-500/50"
+                        style={{
+                          height: `${altura}px`,
+                        }}
+                        title={`${item.data}: ${total} análises`}
+                      />
+                    </div>
+                  );
+                })
+              ) : (
+                <div className="flex h-full w-full items-center justify-center">
+                  <span className="text-xs text-slate-500">
+                    Nenhum dado disponível.
+                  </span>
+                </div>
+              )}
+            </div>
+
+            <p className="mt-3 text-xs text-slate-500">
+              Análises realizadas ao longo do tempo
+            </p>
+          </div>
+
+          {/* DISTRIBUIÇÃO DE RISCO */}
+          <div className="rounded-xl border border-slate-800 bg-slate-950/50 p-4">
+            <div className="mb-4 flex items-center gap-2">
+              <i className="fas fa-chart-pie text-yellow-400" />
+              <span className="text-sm font-medium text-slate-200">
+                Distribuição de risco
+              </span>
+            </div>
+
+            <div className="space-y-3">
+  {carregandoPremium ? (
+    <div className="flex h-24 items-center justify-center">
+      <span className="text-xs text-slate-500">
+        Carregando...
+      </span>
     </div>
+  ) : relatorioPremium?.distribuicao_risco.length ? (
+    relatorioPremium.distribuicao_risco.map((item) => {
+      const total = Number(item.total) || 0;
 
-    <span className="rounded-full border border-indigo-500/20 bg-indigo-500/10 px-3 py-1 text-xs font-semibold text-indigo-400">
-      PRO
-    </span>
-  </div>
+      const totalRiscos = relatorioPremium.distribuicao_risco.reduce(
+        (soma, item) => soma + (Number(item.total) || 0),
+        0
+      );
 
-  {/* PRÉVIA DOS DADOS */}
-  <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-    {/* EVOLUÇÃO */}
-    <div className="rounded-xl border border-slate-800 bg-slate-950/50 p-4">
-      <div className="mb-4 flex items-center gap-2">
-        <i className="fas fa-chart-line text-indigo-400" />
-        <span className="text-sm font-medium text-slate-200">
-          Evolução
-        </span>
-      </div>
+      const percentual =
+        totalRiscos > 0
+          ? (total / totalRiscos) * 100
+          : 0;
 
-      <div className="flex h-20 items-end gap-2">
-        <div className="h-8 flex-1 rounded-t bg-indigo-500/30" />
-        <div className="h-12 flex-1 rounded-t bg-indigo-500/40" />
-        <div className="h-6 flex-1 rounded-t bg-indigo-500/30" />
-        <div className="h-16 flex-1 rounded-t bg-indigo-500/50" />
-        <div className="h-11 flex-1 rounded-t bg-indigo-500/40" />
-        <div className="h-20 flex-1 rounded-t bg-indigo-500/60" />
-      </div>
+      const configuracao = {
+        baixo: {
+          label: "Baixo risco",
+          classe: "bg-green-500/50",
+        },
+        medio: {
+          label: "Médio risco",
+          classe: "bg-yellow-500/50",
+        },
+        alto: {
+          label: "Alto risco",
+          classe: "bg-red-500/50",
+        },
+      }[item.risco];
 
-      <p className="mt-3 text-xs text-slate-500">
-        Análises realizadas ao longo do tempo
-      </p>
-    </div>
-
-    {/* DISTRIBUIÇÃO DE RISCO */}
-    <div className="rounded-xl border border-slate-800 bg-slate-950/50 p-4">
-      <div className="mb-4 flex items-center gap-2">
-        <i className="fas fa-chart-pie text-yellow-400" />
-        <span className="text-sm font-medium text-slate-200">
-          Distribuição de risco
-        </span>
-      </div>
-
-      <div className="space-y-3">
-        <div>
+      return (
+        <div key={item.risco}>
           <div className="mb-1 flex justify-between text-xs">
-            <span className="text-slate-400">Seguro</span>
-            <span className="text-slate-500">—</span>
+            <span className="text-slate-400">
+              {configuracao.label}
+            </span>
+
+            <span className="text-slate-500">
+              {total}
+            </span>
           </div>
 
           <div className="h-2 rounded-full bg-slate-800">
-            <div className="h-full w-3/5 rounded-full bg-green-500/50" />
+            <div
+              className={`h-full rounded-full ${configuracao.classe}`}
+              style={{
+                width: `${percentual}%`,
+              }}
+            />
           </div>
         </div>
+      );
+    })
+  ) : (
+    <div className="flex h-24 items-center justify-center">
+      <span className="text-xs text-slate-500">
+        Nenhum dado disponível.
+      </span>
+    </div>
+  )}
+</div>
+          </div>
 
-        <div>
+          {/* PADRÕES */}
+          <div className="rounded-xl border border-slate-800 bg-slate-950/50 p-4">
+            <div className="mb-4 flex items-center gap-2">
+              <i className="fas fa-magnifying-glass-chart text-red-400" />
+              <span className="text-sm font-medium text-slate-200">
+                Tipos de análise
+              </span>
+            </div>
+
+            <div className="space-y-3">
+  {carregandoPremium ? (
+    <div className="flex h-24 items-center justify-center">
+      <span className="text-xs text-slate-500">
+        Carregando...
+      </span>
+    </div>
+  ) : relatorioPremium?.tipos_analise.length ? (
+    relatorioPremium.tipos_analise.map((item) => {
+      const total = Number(item.total) || 0;
+
+      const totalAnalises =
+        relatorioPremium.tipos_analise.reduce(
+          (soma, item) => soma + (Number(item.total) || 0),
+          0
+        );
+
+      const percentual =
+        totalAnalises > 0
+          ? (total / totalAnalises) * 100
+          : 0;
+
+      const label =
+        item.tipo_consulta === "link"
+          ? "Links"
+          : item.tipo_consulta === "telefone"
+            ? "Telefones"
+            : item.tipo_consulta;
+
+      return (
+        <div key={item.tipo_consulta}>
           <div className="mb-1 flex justify-between text-xs">
-            <span className="text-slate-400">Médio risco</span>
-            <span className="text-slate-500">—</span>
+            <span className="text-slate-400">
+              {label}
+            </span>
+
+            <span className="text-slate-500">
+              {total}
+            </span>
           </div>
 
           <div className="h-2 rounded-full bg-slate-800">
-            <div className="h-full w-2/5 rounded-full bg-yellow-500/50" />
+            <div
+              className="h-full rounded-full bg-indigo-500/50"
+              style={{
+                width: `${percentual}%`,
+              }}
+            />
           </div>
         </div>
-
-        <div>
-          <div className="mb-1 flex justify-between text-xs">
-            <span className="text-slate-400">Alto risco</span>
-            <span className="text-slate-500">—</span>
-          </div>
-
-          <div className="h-2 rounded-full bg-slate-800">
-            <div className="h-full w-1/4 rounded-full bg-red-500/50" />
-          </div>
-        </div>
-      </div>
+      );
+    })
+  ) : (
+    <div className="flex h-24 items-center justify-center">
+      <span className="text-xs text-slate-500">
+        Nenhum dado disponível.
+      </span>
     </div>
-
-    {/* PADRÕES */}
-    <div className="rounded-xl border border-slate-800 bg-slate-950/50 p-4">
-      <div className="mb-4 flex items-center gap-2">
-        <i className="fas fa-magnifying-glass-chart text-red-400" />
-        <span className="text-sm font-medium text-slate-200">
-          Padrões detectados
-        </span>
-      </div>
-
-      <div className="space-y-3">
-        <div className="flex items-center justify-between">
-          <span className="text-xs text-slate-400">
-            Regras acionadas
-          </span>
-          <span className="text-sm font-semibold text-slate-500">
-            —
-          </span>
+  )}
+</div>
+          </div>
         </div>
 
-        <div className="flex items-center justify-between">
-          <span className="text-xs text-slate-400">
-            Ameaças encontradas
-          </span>
-          <span className="text-sm font-semibold text-slate-500">
-            —
-          </span>
-        </div>
-
-        <div className="flex items-center justify-between">
-          <span className="text-xs text-slate-400">
-            Período de maior atividade
-          </span>
-          <span className="text-sm font-semibold text-slate-500">
-            —
-          </span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  {/* BLOQUEIO */}
+        {/* BLOQUEIO */}
+        {!carregandoPremium && !temAcessoPremium && (
   <div className="mt-6 rounded-xl border border-indigo-500/10 bg-indigo-500/5 p-5 text-center">
     <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-400">
       <i className="fas fa-lock" />
     </div>
 
     <h3 className="mt-3 text-sm font-semibold text-slate-200">
-      Relatório completo disponível no Plano Pro
+      Relatório completo disponível no Plano Premium
     </h3>
 
     <p className="mx-auto mt-2 max-w-lg text-xs leading-5 text-slate-500">
       Tenha acesso à evolução das suas análises, distribuição de riscos,
-      padrões detectados e histórico detalhado das suas verificações.
+      tipos de análise e histórico detalhado das suas verificações.
     </p>
 
     <button
@@ -443,11 +624,12 @@ function Relatorios({
       className="btn-outline-indigo mt-4"
       onClick={() => setModalProAberto(true)}
     >
-      Conhecer o Plano Pro
+      Conhecer o Plano Premium
       <i className="fas fa-arrow-right ml-2" />
     </button>
   </div>
-</div>
+)}
+      </div>
 
       {/* MODAL PRO */}
       {modalProAberto && (
