@@ -5,6 +5,7 @@ interface VerificadorProps {
     limiteCota: number;
     onAbrirModalPro: () => void;
     onReportarAmeaca: () => void;
+    onLogout: () => void;
 }
 
 export const FRAUD_MESSAGES: Record<string, { titulo: string; descricao: string; cor: string }> = {
@@ -39,6 +40,7 @@ function Verificador({
     limiteCota,
     onAbrirModalPro,
     onReportarAmeaca,
+    onLogout,
 }: VerificadorProps) {
     const [link, setLink] = useState("");
     const [telefone, setTelefone] = useState("");
@@ -137,6 +139,7 @@ function Verificador({
 
         // Trata erro 401: Token Inválido / Expirado
         if (response.status === 401) {
+            onLogout(); 
             throw new Error(data?.error || data?.mensagem || "Sessão expirada. Faça login novamente.");
         }
 

@@ -127,6 +127,7 @@ function Guardix({ onLogout }: GuardixProps) {
                         onReportarAmeaca={() => {
                             setModalReporteAberto(true);
                         }}
+                        onLogout={onLogout}
                     />
                 )}
 

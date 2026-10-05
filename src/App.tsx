@@ -29,10 +29,13 @@ function App() {
     };
 
     const handleLogout = () => {
-        localStorage.removeItem("guardix_token");
-        localStorage.removeItem("guardix_user");
-        setLogado(false);
-    };
+    localStorage.removeItem("guardix_token");
+    localStorage.removeItem("guardix_user");
+
+    setNomeUsuario("");
+    setExibirBoasVindas(false);
+    setLogado(false);
+};
 
     return (
         <div className="relative min-h-screen bg-slate-950 text-white">
