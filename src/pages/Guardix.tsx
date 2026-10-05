@@ -24,17 +24,55 @@ function Guardix({ onLogout }: GuardixProps) {
     const [usuarioLogado, setUsuarioLogado] = useState<any>(undefined);
 
     useEffect(() => {
-    const dadosSalvos = localStorage.getItem("guardix_user");
-    const token = localStorage.getItem("guardix_token");
+    const carregarUsuario = async () => {
+        const token = localStorage.getItem("guardix_token");
 
-    if (!token) {
-        onLogout();
-        return;
-    }
+        if (!token) {
+            onLogout();
+            return;
+        }
 
-    if (dadosSalvos) {
-        setUsuarioLogado(JSON.parse(dadosSalvos));
-    }
+        try {
+            const API_URL =
+                import.meta.env.VITE_API_URL || "http://localhost:10000";
+
+            const resposta = await fetch(`${API_URL}/users/me`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            if (resposta.status === 401 || resposta.status === 403) {
+                console.error("Token rejeitado pelo backend.");
+                onLogout();
+                return;
+            }
+
+            if (!resposta.ok) {
+                console.error(
+                    "Erro ao carregar usuário:",
+                    resposta.status
+                );
+                return;
+            }
+
+            const dados = await resposta.json();
+
+            if (dados.user) {
+
+                setUsuarioLogado(dados.user);
+
+                localStorage.setItem(
+                    "guardix_user",
+                    JSON.stringify(dados.user)
+                );
+            }
+        } catch (erro) {
+            console.error("Erro de conexão com /users/me:", erro);
+        }
+    };
+
+    carregarUsuario();
 }, []);
 
     const navegar = (secao: string) => {
