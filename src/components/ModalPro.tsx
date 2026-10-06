@@ -10,7 +10,7 @@ export function ModalPro({ onClose, onNavigateToPlanos }: ModalProProps) {
     if (onNavigateToPlanos) {
       onNavigateToPlanos(tipo);
     } else {
-      console.log(`Navegar para: ${tipo}`);
+      console.warn("onNavigateToPlanos não fornecido. Redirecionamento não será feito.");
     }
     onClose();
   };

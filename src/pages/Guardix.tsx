@@ -13,6 +13,8 @@ interface GuardixProps {
     onLogout: () => void;
 }
 
+
+
 function Guardix({ onLogout }: GuardixProps) {
     const [secaoAtiva, setSecaoAtiva] = useState("verificador");
     const [menuAberto, setMenuAberto] = useState(false);
@@ -20,8 +22,13 @@ function Guardix({ onLogout }: GuardixProps) {
     const [modalProAberto, setModalProAberto] = useState(false);
     const [modalReporteAberto, setModalReporteAberto] = useState(false);
     const [consultasRealizadas] = useState(0);
-    
+
     const [usuarioLogado, setUsuarioLogado] = useState<any>(undefined);
+
+    const handleUpgradePro = () => {
+    setModalProAberto(false);
+    setSecaoAtiva("planos");
+};
 
     useEffect(() => {
     const carregarUsuario = async () => {
@@ -42,7 +49,7 @@ function Guardix({ onLogout }: GuardixProps) {
                 },
             });
 
-            if (resposta.status === 401 || resposta.status === 403) {
+            if (resposta.status === 401 ) {
                 console.error("Token rejeitado pelo backend.");
                 onLogout();
                 return;
@@ -132,19 +139,22 @@ function Guardix({ onLogout }: GuardixProps) {
                 )}
 
                 {secaoAtiva === "historico" && ( 
-                    <Historico />
+                    <Historico onLogout={onLogout} />
                 )}
 
                 {secaoAtiva === "feed" && (
-                   <FeedGolpes />
+                   <FeedGolpes
+                    onUpgradePro={handleUpgradePro}
+                    onLogout={onLogout} />
+
                 )}
 
                 {secaoAtiva === "relatorios" && (
-                   <Relatorios />
+                   <Relatorios onLogout={onLogout} />
                 )}
 
                 {secaoAtiva === "planos" && (
-                    <Planos />
+                    <Planos onLogout={onLogout} />
                 )}
                 
                 {secaoAtiva === "pro" && (

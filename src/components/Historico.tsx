@@ -15,11 +15,13 @@ interface HistoricoItem {
 interface HistoricoProps {
     historicoInicial?: HistoricoItem[];
     apiUrl?: string;
+    onLogout?: () => void;
 }
 
 function Historico({
     historicoInicial,
-    apiUrl = "http://localhost:10000/api/historico"
+    apiUrl = "http://localhost:10000/api/historico",
+    onLogout,
 }: HistoricoProps) {
     const [historico, setHistorico] = useState<HistoricoItem[]>(historicoInicial || []);
     const [carregando, setCarregando] = useState<boolean>(!historicoInicial);
@@ -41,6 +43,10 @@ function Historico({
                     },
                 });
 
+                if(response.status === 401) {
+                    onLogout?.();
+                    return;
+                }
                 if (!response.ok) {
                     throw new Error("Erro ao carregar o histórico de análises.");
                 }

@@ -74,96 +74,96 @@ function Verificador({
     };
 
     const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
+        e.preventDefault();
 
-    if (consultasRealizadas >= limiteCota) {
-        onAbrirModalPro();
-        return;
-    }
-
-    if (!link && !telefone && !arquivo) {
-        setErro("Preencha ao menos um campo.");
-        return;
-    }
-
-    setErro("");
-    setResultado(null);
-    setCarregando(true);
-
-    const token = localStorage.getItem("guardix_token");
-
-    // Validação local prévia
-    if (!token) {
-        setErro("Sessão expirada ou não autenticada. Faça login novamente.");
-        setCarregando(false);
-        return;
-    }
-
-    try {
-        let response: Response;
-        const headers = {
-            Authorization: `Bearer ${token}`,
-        };
-
-        if (arquivo) {
-            const formData = new FormData();
-            formData.append("imagem", arquivo);
-
-            response = await fetch("http://localhost:10000/api/print", {
-                method: "POST",
-                headers,
-                body: formData,
-            });
-        } else if (link) {
-            response = await fetch("http://localhost:10000/api/link", {
-                method: "POST",
-                headers: {
-                    ...headers,
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ url: link }),
-            });
-        } else {
-            response = await fetch("http://localhost:10000/api/phone", {
-                method: "POST",
-                headers: {
-                    ...headers,
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ numero: telefone }),
-            });
+        if (consultasRealizadas >= limiteCota) {
+            onAbrirModalPro();
+            return;
         }
 
-        // Tenta fazer o parse do JSON enviado pela API (mesmo para códigos de erro HTTP)
-        const data = await response.json().catch(() => null);
-
-        // Trata erro 401: Token Inválido / Expirado
-        if (response.status === 401) {
-            onLogout(); 
-            throw new Error(data?.error || data?.mensagem || "Sessão expirada. Faça login novamente.");
+        if (!link && !telefone && !arquivo) {
+            setErro("Preencha ao menos um campo.");
+            return;
         }
 
-        // Trata erro 403: Cota do Plano Atingida
-        if (response.status === 403) {
-            onAbrirModalPro(); // Abre o modal de upgrade automaticamente
-            throw new Error(data?.error || data?.mensagem || "Limite de consultas diárias atingido.");
+        setErro("");
+        setResultado(null);
+        setCarregando(true);
+
+        const token = localStorage.getItem("guardix_token");
+
+        // Validação local prévia
+        if (!token) {
+            setErro("Sessão expirada ou não autenticada. Faça login novamente.");
+            setCarregando(false);
+            return;
         }
 
-        if (!response.ok) {
-            throw new Error(data?.error || data?.mensagem || `Erro no servidor (${response.status})`);
-        }
+        try {
+            let response: Response;
+            const headers = {
+                Authorization: `Bearer ${token}`,
+            };
 
-        setResultado(data);
-    } catch (error) {
-        setErro(
-            error instanceof Error
-                ? error.message
-                : "Erro ao realizar análise."
-        );
-    } finally {
-        setCarregando(false);
-    }
-};
+            if (arquivo) {
+                const formData = new FormData();
+                formData.append("imagem", arquivo);
+
+                response = await fetch("http://localhost:10000/api/print", {
+                    method: "POST",
+                    headers,
+                    body: formData,
+                });
+            } else if (link) {
+                response = await fetch("http://localhost:10000/api/link", {
+                    method: "POST",
+                    headers: {
+                        ...headers,
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ url: link }),
+                });
+            } else {
+                response = await fetch("http://localhost:10000/api/phone", {
+                    method: "POST",
+                    headers: {
+                        ...headers,
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ numero: telefone }),
+                });
+            }
+
+            // Tenta fazer o parse do JSON enviado pela API (mesmo para códigos de erro HTTP)
+            const data = await response.json().catch(() => null);
+
+            // Trata erro 401: Token Inválido / Expirado
+            if (response.status === 401) {
+                onLogout();
+                throw new Error(data?.error || data?.mensagem || "Sessão expirada. Faça login novamente.");
+            }
+
+            // Trata erro 403: Cota do Plano Atingida
+            if (response.status === 403) {
+                onAbrirModalPro(); // Abre o modal de upgrade automaticamente
+                throw new Error(data?.error || data?.mensagem || "Limite de consultas diárias atingido.");
+            }
+
+            if (!response.ok) {
+                throw new Error(data?.error || data?.mensagem || `Erro no servidor (${response.status})`);
+            }
+
+            setResultado(data);
+        } catch (error) {
+            setErro(
+                error instanceof Error
+                    ? error.message
+                    : "Erro ao realizar análise."
+            );
+        } finally {
+            setCarregando(false);
+        }
+    };
 
     const rawScore = resultado?.score ?? 0;
     const score = Math.min(rawScore, 100);
@@ -385,6 +385,25 @@ function Verificador({
                                                         {resultado.conclusao}
                                                     </li>
                                                 </ul>
+                                            </div>
+                                        )}
+
+                                        {resultado.analiseDetalhadaIa && (
+                                            <div className="attention-points">
+                                                <p className="attention-title">
+                                                    <i className="fas fa-file-lines"></i> Análise detalhada
+                                                </p>
+
+                                                <div
+                                                    style={{
+                                                        whiteSpace: "pre-line",
+                                                        lineHeight: "1.6",
+                                                        color: "var(--text-muted)",
+                                                        padding: "4px 0",
+                                                    }}
+                                                >
+                                                    {resultado.analiseDetalhadaIa}
+                                                </div>
                                             </div>
                                         )}
 

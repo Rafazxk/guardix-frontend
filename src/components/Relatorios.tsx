@@ -11,6 +11,7 @@ interface EstatisticasUsuario {
 interface RelatoriosProps {
   apiUrl?: string;
   onUpgradePro?: () => void;
+  onLogout?: () => void;
 }
 
 interface RelatorioPremium {
@@ -33,6 +34,7 @@ interface RelatorioPremium {
 function Relatorios({
   apiUrl = "http://localhost:10000/stats/estatisticas",
   onUpgradePro,
+  onLogout,
 }: RelatoriosProps) {
 
   const [stats, setStats] = useState<EstatisticasUsuario>({
@@ -71,6 +73,16 @@ function Relatorios({
             Authorization: token ? `Bearer ${token}` : "",
           },
         });
+
+        if (response.status === 401) {
+    onLogout?.();
+    return;
+}
+
+if (response.status === 403) {
+    setRelatorioPremium(null);
+    return;
+}
 
         if (!response.ok) {
           throw new Error(

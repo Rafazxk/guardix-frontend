@@ -73,7 +73,7 @@ function ModalReport({
             }
 
             const response = await fetch(
-                "http://192.168.0.9:10000/stats/report",
+                "http://localhost:10000/stats/report",
                 {
                     method: "POST",
                     headers: {

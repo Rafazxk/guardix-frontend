@@ -22,7 +22,6 @@ function Sidebar({
     abrirModalReporte,
     usuario,
 }: SidebarProps) {
-
     const alternarMenu = () => {
         setMenuAberto((prev) => !prev);
     };
