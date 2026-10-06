@@ -1,10 +1,112 @@
 import { useState } from "react";
+import ModalPagamento from "../ModalPagamento";
 
-function Planos() {
+const API_URL = import.meta.env.REACT_APP_API_URL || "http://localhost:10000";
+
+interface PlanosProps {
+    onLogout?: () => void;
+}
+
+function Planos({ onLogout }: PlanosProps) {
     const [periodo, setPeriodo] = useState<"mensal" | "anual">("mensal");
-     const precoPro = periodo === "mensal" ? "XX,XX" : "XX,XX";
-     const precoPremium = periodo === "mensal" ? "XX,XX" : "XX,XX";
+
+    const [modalPagamentoAberto, setModalPagamentoAberto] = useState(false);
+    const [planoSelecionado, setPlanoSelecionado] = useState<"pro" | "premium">("premium");
+
+     const precoPro = periodo === "mensal" ? "19,90" : "199,00";
+     const precoPremium = periodo === "mensal" ? "49,90" : "499,00";
+
+
+const handleAssinarPro = async () => {
+    try {
+        const token = localStorage.getItem("guardix_token");
+
+        if (!token) {
+            throw new Error("Usuário não autenticado.");
+        }
+
+        const response = await fetch(`${API_URL}/payments/checkout`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+                plano: "pro",
+            }),
+        });
+
+        const dados = await response.json();
+
+        if (response.status === 401) {
+            onLogout?.();
+            return;
+        }
+
+        if (!response.ok) {
+            throw new Error(
+                dados.message || "Erro ao iniciar pagamento."
+            );
+        }
+
+        if (!dados.link) {
+            throw new Error("Link de pagamento não recebido.");
+        }
+
+        window.location.href = dados.link;
+    } catch (erro: any) {
+        console.error("Erro ao iniciar pagamento:", erro);
+        alert(erro.message || "Erro ao iniciar pagamento.");
+    }
+};
+
+const handleAssinarPremium = async () => {
+    try {
+        const token = localStorage.getItem("guardix_token");
+
+        if (!token) {
+            throw new Error("Usuário não autenticado.");
+        }
+
+        const response = await fetch(`${API_URL}/payments/checkout`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+                plano: "premium",
+            }),
+        });
+
+        const dados = await response.json();
+
+        if(response.status === 401) {
+            onLogout?.();
+            return;
+        }
+
+
+        if (!response.ok) {
+            throw new Error(
+                dados.message || "Erro ao iniciar pagamento."
+            );
+        }
+
+        if (!dados.link) {
+            throw new Error("Link de pagamento não recebido.");
+        }
+
+        window.location.href = dados.link;
+    } catch (erro: any) {
+        console.error("Erro ao iniciar pagamento:", erro);
+        alert(erro.message || "Erro ao iniciar pagamento.");
+    }
+};
+
+
     return (
+        
         <section className="content-section">
             <div className="page-header">
                 <h1 className="page-title">Planos Guardix</h1>
@@ -97,6 +199,10 @@ function Planos() {
                         
                     <button
                         type="button"
+                        onClick={() => {
+                            setPlanoSelecionado("pro");
+                            setModalPagamentoAberto(true)
+                        }}
                         className="w-full rounded-xl bg-indigo-600 px-5 py-3 font-semibold text-white transition hover:bg-indigo-500"
                     >
                         Assinar Pro
@@ -162,6 +268,11 @@ function Planos() {
 
                     <button
                         type="button"
+                        onClick={() =>
+                           {
+                            setPlanoSelecionado("premium");
+                            setModalPagamentoAberto(true)}
+                           }
                         className="w-full rounded-xl bg-cyan-400 px-5 py-3 font-semibold text-slate-950 transition hover:bg-cyan-300"
                     >
                         Assinar Premium+
@@ -279,7 +390,16 @@ function Planos() {
                        </div>
                       </div>
 
+<ModalPagamento
+    aberto={modalPagamentoAberto}
+    plano={planoSelecionado}
+    onFechar={() => setModalPagamentoAberto(false)}
+    onContinuar={
+        planoSelecionado === "pro" ? handleAssinarPro : handleAssinarPremium
+    }
+/>
         </section>
+        
     );
 }
 
