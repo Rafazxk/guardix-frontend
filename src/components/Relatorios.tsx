@@ -53,7 +53,7 @@ function Relatorios({
   const [carregandoPremium, setCarregandoPremium] =
     useState<boolean>(true);
 
-  const [erroPremium, setErroPremium] =
+  const [, setErroPremium] =
     useState<string | null>(null)
 
   const [modalProAberto, setModalProAberto] = useState<boolean>(false);
