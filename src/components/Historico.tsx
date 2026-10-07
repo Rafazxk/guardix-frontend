@@ -22,7 +22,7 @@ interface HistoricoProps {
 
 function Historico({
     historicoInicial,
-    apiUrl = `${API_URL}/stats/historico`,
+    apiUrl = `${API_URL}/api/historico`,
     onLogout,
 }: HistoricoProps) {
     const [historico, setHistorico] = useState<HistoricoItem[]>(historicoInicial || []);
