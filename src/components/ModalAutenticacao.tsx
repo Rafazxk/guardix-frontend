@@ -148,63 +148,102 @@ function ModalAutenticacao({
     };
 
     // 4. Confirma o código digitado e valida a autenticação final
-    const handleConfirmarCodigo = async (e: FormEvent<HTMLFormElement>) => {
+    const handleConfirmarCodigo = async (
+    e: FormEvent<HTMLFormElement>
+) => {
     e.preventDefault();
     setCarregando(true);
     setMensagemErro("");
 
     try {
-        const resposta = await fetch(`${API_URL}/verification/verify-email`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                email: emailAtual,
-                code: codigo,
-            }),
-        });
+        // 1. Confirma o código de verificação
+        const resposta = await fetch(
+            `${API_URL}/verification/verify-email`,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    email: emailAtual,
+                    code: codigo,
+                }),
+            }
+        );
 
         const dados = await resposta.json();
 
         if (!resposta.ok) {
-            throw new Error(dados.message || "Código inválido ou expirado.");
+            throw new Error(
+                dados.message || "Código inválido ou expirado."
+            );
         }
 
-        // Procura a propriedade token do backend (token ou accessToken)
-        const jwtToken = dados.token || dados.accessToken;
-
-        if (jwtToken) {
-            localStorage.setItem("guardix_token", jwtToken);
-        } else {
-            // Se a rota de verificação não gera token automaticamente, 
-            // dispara o login com email e senha para obter um JWT válido.
-            const loginResp = await fetch(`${API_URL}/users/login`, {
+        // 2. O endpoint de verificação NÃO define JWT.
+        // Depois de confirmar o e-mail, fazemos o login normalmente.
+        const loginResp = await fetch(
+            `${API_URL}/users/login`,
+            {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json",
+                },
                 body: JSON.stringify({
                     email: emailAtual,
-                    senha: aba === "login" ? senhaLogin : senhaCadastro,
+                    senha:
+                        aba === "login"
+                            ? senhaLogin
+                            : senhaCadastro,
                 }),
-            });
-            const loginDados = await loginResp.json();
-
-            if (loginResp.ok && (loginDados.token || loginDados.accessToken)) {
-                localStorage.setItem("guardix_token", loginDados.token || loginDados.accessToken);
-            } else {
-                throw new Error("Erro ao obter o token de acesso. Faça login manualmente.");
             }
+        );
+
+        const loginDados = await loginResp.json();
+
+        if (!loginResp.ok) {
+            throw new Error(
+                loginDados.message ||
+                    "E-mail confirmado, mas não foi possível realizar o login."
+            );
         }
 
-        if (dados.user) {
-            localStorage.setItem("guardix_user", JSON.stringify(dados.user));
+        // 3. O JWT deve vir SOMENTE do login
+        if (
+            !loginDados.token ||
+            typeof loginDados.token !== "string"
+        ) {
+            throw new Error(
+                "O servidor não retornou um JWT válido."
+            );
         }
 
+        // 4. Salva o JWT válido
+        localStorage.setItem(
+            "guardix_token",
+            loginDados.token
+        );
+
+        // 5. Salva os dados do usuário
+        if (loginDados.user) {
+            localStorage.setItem(
+                "guardix_user",
+                JSON.stringify(loginDados.user)
+            );
+        }
+
+        // 6. Avisa o App que o login terminou
         if (onLoginSuccess) {
             onLoginSuccess();
         }
 
+        // 7. Fecha o modal
         onFechar();
+
     } catch (erro: any) {
-        setMensagemErro(erro.message || "Falha na validação do código.");
+        setMensagemErro(
+            erro.message ||
+                "Falha na validação do código."
+        );
     } finally {
         setCarregando(false);
     }

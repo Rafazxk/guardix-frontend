@@ -2,6 +2,9 @@ import { useState, type FormEvent } from "react";
 
 type TipoAmeaca = "link" | "telefone";
 
+const API_URL =
+    import.meta.env.VITE_API_URL || "http://localhost:10000";
+
 interface ModalReportProps {
     isOpen: boolean;
     onClose: () => void;
@@ -71,9 +74,8 @@ function ModalReport({
                     "Sua sessão expirou. Faça login novamente."
                 );
             }
-
-            const response = await fetch(
-                "http://localhost:10000/stats/report",
+            
+            const response = await fetch(`${API_URL}/stats/report`,
                 {
                     method: "POST",
                     headers: {

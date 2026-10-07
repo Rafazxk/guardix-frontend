@@ -27,7 +27,7 @@ interface FeedGolpesProps {
 }
 
 function FeedGolpes({
-    apiUrl = "http://localhost:10000/stats/feed",
+    apiUrl = import.meta.env.VITE_API_URL || "http://localhost:10000/stats/feed" ,
     onLogout,
     onUpgradePro,
 }: FeedGolpesProps) {

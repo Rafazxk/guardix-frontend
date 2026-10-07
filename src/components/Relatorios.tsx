@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { ModalPro } from "./ModalPro";
 
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:10000";
+
 interface EstatisticasUsuario {
   total_consultas: number | string;
   ameacas_evitadas: number | string;
@@ -32,7 +34,7 @@ interface RelatorioPremium {
 }
 
 function Relatorios({
-  apiUrl = "http://localhost:10000/stats/estatisticas",
+  apiUrl = `${API_URL}/stats/estatisticas`,
   onUpgradePro,
   onLogout,
 }: RelatoriosProps) {
@@ -120,7 +122,7 @@ if (response.status === 403) {
         const token = localStorage.getItem("guardix_token");
 
         const response = await fetch(
-          "http://localhost:10000/stats/relatorio",
+          `${API_URL}/stats/relatorio`,
           {
             method: "GET",
             headers: {

@@ -1,5 +1,7 @@
 import { type FormEvent, useState, useEffect } from "react";
 
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:10000";
+
 interface VerificadorProps {
     consultasRealizadas: number;
     limiteCota: number;
@@ -109,13 +111,13 @@ function Verificador({
                 const formData = new FormData();
                 formData.append("imagem", arquivo);
 
-                response = await fetch("http://localhost:10000/api/print", {
+                response = await fetch(`${API_URL}/api/print`, {
                     method: "POST",
                     headers,
                     body: formData,
                 });
             } else if (link) {
-                response = await fetch("http://localhost:10000/api/link", {
+                response = await fetch(`${API_URL}/api/link`, {
                     method: "POST",
                     headers: {
                         ...headers,
@@ -124,7 +126,7 @@ function Verificador({
                     body: JSON.stringify({ url: link }),
                 });
             } else {
-                response = await fetch("http://localhost:10000/api/phone", {
+                response = await fetch(`${API_URL}/api/phone`, {
                     method: "POST",
                     headers: {
                         ...headers,

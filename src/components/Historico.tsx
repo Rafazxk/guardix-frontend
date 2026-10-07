@@ -2,6 +2,8 @@ import { useMemo, useState, useEffect } from "react";
 
 type TipoHistorico = "todos" | "link" | "telefone" | "print";
 
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:10000";
+
 interface HistoricoItem {
     id?: number | string;
     data: string;
@@ -20,7 +22,7 @@ interface HistoricoProps {
 
 function Historico({
     historicoInicial,
-    apiUrl = "http://localhost:10000/api/historico",
+    apiUrl = `${API_URL}/stats/historico`,
     onLogout,
 }: HistoricoProps) {
     const [historico, setHistorico] = useState<HistoricoItem[]>(historicoInicial || []);
