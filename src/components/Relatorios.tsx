@@ -55,7 +55,7 @@ function Relatorios({
   const [carregandoPremium, setCarregandoPremium] =
     useState<boolean>(true);
 
-  const [, setErroPremium] =
+  const [erroPremium, setErroPremium] =
     useState<string | null>(null)
 
   const [modalProAberto, setModalProAberto] = useState<boolean>(false);
@@ -82,8 +82,14 @@ function Relatorios({
 }
 
 if (response.status === 403) {
-    setRelatorioPremium(null);
-    return;
+  const dados = await response.json();
+
+  setRelatorioPremium(null);
+  setErroPremium(
+    dados.mensagem || dados.erro || "Plano insuficiente."
+  );
+
+  return;
 }
 
         if (!response.ok) {
@@ -617,6 +623,12 @@ const temAcessoPremium =
           </div>
         </div>
 
+{erroPremium && (
+  <div className="mt-4 rounded-xl border border-yellow-500/20 bg-yellow-500/10 p-4 text-sm text-yellow-400">
+    <i className="fas fa-lock mr-2" />
+    {erroPremium}
+  </div>
+)}
         {/* BLOQUEIO */}
         {!carregandoPremium && !temAcessoPremium && (
   <div className="mt-6 rounded-xl border border-indigo-500/10 bg-indigo-500/5 p-5 text-center">

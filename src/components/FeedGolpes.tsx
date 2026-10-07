@@ -2,6 +2,9 @@ import { useState, useEffect } from "react";
 
 import { ModalPro } from "./ModalPro";
 
+const API_URL =
+    import.meta.env.VITE_API_URL || "http://localhost:10000";
+
 interface FeedItem {
     tipo: string;
     valor: string;
@@ -27,7 +30,7 @@ interface FeedGolpesProps {
 }
 
 function FeedGolpes({
-    apiUrl = import.meta.env.VITE_API_URL || "http://localhost:10000/stats/feed" ,
+    apiUrl = `${API_URL}/stats/feed`,
     onLogout,
     onUpgradePro,
 }: FeedGolpesProps) {
