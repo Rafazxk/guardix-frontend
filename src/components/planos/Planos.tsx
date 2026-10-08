@@ -13,8 +13,8 @@ function Planos({ onLogout }: PlanosProps) {
     const [modalPagamentoAberto, setModalPagamentoAberto] = useState(false);
     const [planoSelecionado, setPlanoSelecionado] = useState<"pro" | "premium">("premium");
 
-     const precoPro = periodo === "mensal" ? "19,90" : "199,00";
-     const precoPremium = periodo === "mensal" ? "49,90" : "499,00";
+     const precoPro = periodo === "mensal" ? "29,90" : "299,00";
+    const precoPremium = periodo === "mensal" ? "59,90" : "599,00";
 
 
 const handleAssinarPro = async () => {
@@ -33,6 +33,7 @@ const handleAssinarPro = async () => {
             },
             body: JSON.stringify({
                 plano: "pro",
+                periodo: periodo === "mensal" ? "monthly" : "yearly",
             }),
         });
 
@@ -76,6 +77,7 @@ const handleAssinarPremium = async () => {
             },
             body: JSON.stringify({
                 plano: "premium",
+                periodo: periodo === "mensal" ? "monthly" : "yearly",
             }),
         });
 
