@@ -5,7 +5,7 @@ import Verificador from "../components/Verificador";
 import Historico from "../components/Historico";
 import FeedGolpes from "../components/FeedGolpes";
 import Relatorios from "../components/Relatorios";
-import Planos from "../components/planos/Planos";
+import Planos from "../components/Planos";
 import ModalPro from "../components/ModalPro";
 import ModalReport from "../components/ModalReport";
 
@@ -25,62 +25,68 @@ function Guardix({ onLogout }: GuardixProps) {
 
     const [usuarioLogado, setUsuarioLogado] = useState<any>(undefined);
 
+
     const handleUpgradePro = () => {
-    setModalProAberto(false);
-    setSecaoAtiva("planos");
-};
+        setModalProAberto(false);
+        setSecaoAtiva("planos");
+    };
+
+    const handleNavigateToPlanos = () => {
+        setModalProAberto(false);
+        setSecaoAtiva("planos");
+    };
 
     useEffect(() => {
-    const carregarUsuario = async () => {
-        const token = localStorage.getItem("guardix_token");
+        const carregarUsuario = async () => {
+            const token = localStorage.getItem("guardix_token");
 
-        if (!token) {
-            onLogout();
-            return;
-        }
-
-        try {
-            const API_URL =
-                import.meta.env.VITE_API_URL || "http://localhost:10000";
-
-            const resposta = await fetch(`${API_URL}/users/me`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-
-            if (resposta.status === 401 ) {
-                console.error("Token rejeitado pelo backend.");
+            if (!token) {
                 onLogout();
                 return;
             }
 
-            if (!resposta.ok) {
-                console.error(
-                    "Erro ao carregar usuário:",
-                    resposta.status
-                );
-                return;
+            try {
+                const API_URL =
+                    import.meta.env.VITE_API_URL || "http://localhost:10000";
+
+                const resposta = await fetch(`${API_URL}/users/me`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+
+                if (resposta.status === 401) {
+                    console.error("Token rejeitado pelo backend.");
+                    onLogout();
+                    return;
+                }
+
+                if (!resposta.ok) {
+                    console.error(
+                        "Erro ao carregar usuário:",
+                        resposta.status
+                    );
+                    return;
+                }
+
+                const dados = await resposta.json();
+
+                if (dados.user) {
+
+                    setUsuarioLogado(dados.user);
+
+                    localStorage.setItem(
+                        "guardix_user",
+                        JSON.stringify(dados.user)
+                    );
+                }
+            } catch (erro) {
+                console.error("Erro de conexão com /users/me:", erro);
             }
+        };
 
-            const dados = await resposta.json();
-
-            if (dados.user) {
-
-                setUsuarioLogado(dados.user);
-
-                localStorage.setItem(
-                    "guardix_user",
-                    JSON.stringify(dados.user)
-                );
-            }
-        } catch (erro) {
-            console.error("Erro de conexão com /users/me:", erro);
-        }
-    };
-
-    carregarUsuario();
-}, []);
+        carregarUsuario();
+    }, []);
 
     const navegar = (secao: string) => {
         setSecaoAtiva(secao);
@@ -92,6 +98,28 @@ function Guardix({ onLogout }: GuardixProps) {
 
     return (
         <div className="corpo-dashboard">
+            <button
+                type="button"
+                className="
+        fixed right-6 top-4 z-[1050]
+        flex items-center gap-2
+        rounded-lg
+        border border-amber-500/40
+        bg-slate-900
+        px-4 py-2
+        text-sm font-semibold
+        text-amber-400
+        shadow-lg
+        transition-all
+        hover:border-amber-400
+        hover:bg-slate-800
+        hover:text-amber-300
+    "
+                onClick={() => setSecaoAtiva("planos")}
+            >
+                <i className="fas fa-arrow-up"></i>
+                Atualize seu plano
+            </button>
 
             <button
                 type="button"
@@ -115,7 +143,7 @@ function Guardix({ onLogout }: GuardixProps) {
             </button>
 
             <Sidebar
-                usuario={usuarioLogado} 
+                usuario={usuarioLogado}
                 menuAberto={menuAberto}
                 setMenuAberto={setMenuAberto}
                 secaoAtiva={secaoAtiva}
@@ -129,7 +157,7 @@ function Guardix({ onLogout }: GuardixProps) {
                 {secaoAtiva === "verificador" && (
                     <Verificador
                         consultasRealizadas={consultasRealizadas}
-                        limiteCota={10}
+                        limiteCota={5}
                         onAbrirModalPro={() => setModalProAberto(true)}
                         onReportarAmeaca={() => {
                             setModalReporteAberto(true);
@@ -138,40 +166,41 @@ function Guardix({ onLogout }: GuardixProps) {
                     />
                 )}
 
-                {secaoAtiva === "historico" && ( 
+                {secaoAtiva === "historico" && (
                     <Historico onLogout={onLogout} />
                 )}
 
                 {secaoAtiva === "feed" && (
-                   <FeedGolpes
-                    onUpgradePro={handleUpgradePro}
-                    onLogout={onLogout} />
+                    <FeedGolpes
+                        onUpgradePro={handleUpgradePro}
+                        onLogout={onLogout} />
 
                 )}
 
                 {secaoAtiva === "relatorios" && (
-                   <Relatorios onLogout={onLogout} />
+                    <Relatorios onLogout={onLogout}
+                        onUpgradePro={handleUpgradePro}
+                    />
+
                 )}
 
                 {secaoAtiva === "planos" && (
-                    <Planos onLogout={onLogout} />
+                    <Planos
+                        onLogout={onLogout}
+                        planoAtual={usuarioLogado?.plano?.toLowerCase()} />
                 )}
-                
-                {secaoAtiva === "pro" && (
-                    <ModalPro 
-                        onClose={() => setModalProAberto(false)}
-                    />
-                )}
-
             </main>
 
             {modalProAberto && (
-    <ModalPro onClose={() => setModalProAberto(false)} />
-)}
+                <ModalPro
+                    onClose={() => setModalProAberto(false)}
+                    onNavigateToPlanos={handleNavigateToPlanos}
+                />
+            )}
 
-            <ModalReport 
-                isOpen={modalReporteAberto} 
-                onClose={() => setModalReporteAberto(false)} 
+            <ModalReport
+                isOpen={modalReporteAberto}
+                onClose={() => setModalReporteAberto(false)}
             />
 
         </div>

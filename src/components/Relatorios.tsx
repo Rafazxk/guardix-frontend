@@ -172,12 +172,10 @@ if (!response.ok) {
 const temAcessoPremium =
   !carregandoPremium && relatorioPremium !== null;
 
-  const handleIrParaPlanos = () => {
+const handleIrParaPlanos = () => {
     setModalProAberto(false);
-    if (onUpgradePro) {
-      onUpgradePro();
-    }
-  };
+    onUpgradePro?.();
+};
 
   return (
     <section className="content-section">

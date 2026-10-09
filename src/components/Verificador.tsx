@@ -147,8 +147,11 @@ function Verificador({
 
             // Trata erro 403: Cota do Plano Atingida
             if (response.status === 403) {
-                onAbrirModalPro(); // Abre o modal de upgrade automaticamente
-                throw new Error(data?.error || data?.mensagem || "Limite de consultas diárias atingido.");
+                onAbrirModalPro();
+                throw new Error(
+                    data?.error ||
+                    data?.mensagem ||
+                    "Limite de 5 consultas atingido. Atualize seu plano para continuar.");
             }
 
             if (!response.ok) {
