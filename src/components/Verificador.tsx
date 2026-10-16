@@ -6,7 +6,11 @@ interface VerificadorProps {
     consultasRealizadas: number;
     limiteCota: number;
     onAbrirModalPro: () => void;
-    onReportarAmeaca: () => void;
+    onReportarAmeaca: (ameaca: {
+        tipo: "link" | "telefone";
+        valor: string;
+        score: number;
+    }) => void;
     onLogout: () => void;
 }
 
@@ -51,7 +55,10 @@ function Verificador({
     const [carregando, setCarregando] = useState(false);
     const [resultado, setResultado] = useState<any>(null);
     const [erro, setErro] = useState("");
-
+    const [ameacaAnalisada, setAmeacaAnalisada] = useState<{
+        tipo: "link" | "telefone" | "print";
+        valor: string;
+    } | null>(null);
     // Gerencia a criação e limpeza da URL de preview da imagem
     useEffect(() => {
         if (!arquivo) {
@@ -100,7 +107,15 @@ function Verificador({
             setCarregando(false);
             return;
         }
+        const tipoAnalisado = arquivo
+            ? "print"
+            : link.trim()
+                ? "link"
+                : "telefone";
 
+        const valorAnalisado = arquivo
+            ? arquivo.name
+            : link.trim() || telefone.trim();
         try {
             let response: Response;
             const headers = {
@@ -159,6 +174,11 @@ function Verificador({
             }
 
             setResultado(data);
+
+            setAmeacaAnalisada({
+                tipo: tipoAnalisado,
+                valor: valorAnalisado,
+            });
         } catch (error) {
             setErro(
                 error instanceof Error
@@ -459,11 +479,19 @@ function Verificador({
                                         )}
 
                                         <div className="result-actions">
-                                            {isPerigo && (
+                                            {isPerigo && ameacaAnalisada && ameacaAnalisada.tipo !== "print" && (
                                                 <button
                                                     id="btn-reportar"
                                                     className="btn-report"
-                                                    onClick={onReportarAmeaca}
+                                                    onClick={() => {
+                                                        if (ameacaAnalisada.tipo === "print") return;
+
+                                                        onReportarAmeaca({
+                                                            tipo: ameacaAnalisada.tipo,
+                                                            valor: ameacaAnalisada.valor,
+                                                            score: rawScore,
+                                                        });
+                                                    }}
                                                 >
                                                     <i className="fas fa-flag"></i>
                                                     Reportar Ameaça

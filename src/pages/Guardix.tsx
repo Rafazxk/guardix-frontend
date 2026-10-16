@@ -8,11 +8,18 @@ import Relatorios from "../components/Relatorios";
 import Planos from "../components/Planos";
 import ModalPro from "../components/ModalPro";
 import ModalReport from "../components/ModalReport";
+import Chatbot from "../components/Chatbot";
+import ModalPerfil from "../components/ModalPerfil";
 
 interface GuardixProps {
     onLogout: () => void;
 }
 
+type AmeacaParaReportar = {
+    tipo: "link" | "telefone";
+    valor: string;
+    score: number;
+};
 
 
 function Guardix({ onLogout }: GuardixProps) {
@@ -22,9 +29,10 @@ function Guardix({ onLogout }: GuardixProps) {
     const [modalProAberto, setModalProAberto] = useState(false);
     const [modalReporteAberto, setModalReporteAberto] = useState(false);
     const [consultasRealizadas] = useState(0);
-
+    const [modalPerfilAberto, setModalPerfilAberto] = useState(false);
     const [usuarioLogado, setUsuarioLogado] = useState<any>(undefined);
-
+    const [ameacaParaReportar, setAmeacaParaReportar] =
+        useState<AmeacaParaReportar | null>(null);
 
     const handleUpgradePro = () => {
         setModalProAberto(false);
@@ -95,32 +103,36 @@ function Guardix({ onLogout }: GuardixProps) {
             setMenuAberto(false);
         }
     };
-
+    
     return (
         <div className="corpo-dashboard">
-            <button
-                type="button"
-                className="
-        fixed right-6 top-4 z-[1050]
-        flex items-center gap-2
-        rounded-lg
-        border border-amber-500/40
-        bg-slate-900
-        px-4 py-2
-        text-sm font-semibold
-        text-amber-400
-        shadow-lg
-        transition-all
-        hover:border-amber-400
-        hover:bg-slate-800
-        hover:text-amber-300
-    "
-                onClick={() => setSecaoAtiva("planos")}
-            >
-                <i className="fas fa-arrow-up"></i>
-                Atualize seu plano
-            </button>
-
+         {usuarioLogado?.plano?.toLowerCase() !== "premium+" &&
+    usuarioLogado?.plano?.toLowerCase() !== "premium" && (
+        <button
+            type="button"
+            className="
+                fixed right-6 top-4 z-[1050]
+                flex items-center gap-2
+                rounded-lg
+                border border-amber-500/40
+                bg-slate-900
+                px-4 py-2
+                text-sm font-semibold
+                text-amber-400
+                shadow-lg
+                transition-all
+                hover:border-amber-400
+                hover:bg-slate-800
+                hover:text-amber-300
+            "
+            onClick={() => setSecaoAtiva("planos")}
+        >
+            <i className="fas fa-arrow-up" aria-hidden="true"></i>
+            {usuarioLogado?.plano?.toLowerCase() === "pro"
+                ? "Conheça o Premium+"
+                : "Atualize seu plano"}
+        </button>
+    )}
             <button
                 type="button"
                 onClick={() => setMenuAberto(true)}
@@ -143,14 +155,15 @@ function Guardix({ onLogout }: GuardixProps) {
             </button>
 
             <Sidebar
-                usuario={usuarioLogado}
-                menuAberto={menuAberto}
-                setMenuAberto={setMenuAberto}
-                secaoAtiva={secaoAtiva}
-                navegar={navegar}
-                abrirModalPro={() => setModalProAberto(true)}
-                abrirModalReporte={() => setModalReporteAberto(true)}
-            />
+    usuario={usuarioLogado}
+    menuAberto={menuAberto}
+    setMenuAberto={setMenuAberto}
+    secaoAtiva={secaoAtiva}
+    navegar={navegar}
+    abrirModalPro={() => setModalProAberto(true)}
+    abrirModalReporte={() => setModalReporteAberto(true)}
+    abrirModalPerfil={() => setModalPerfilAberto(true)}
+/>
 
             <main className="main-content">
 
@@ -159,7 +172,8 @@ function Guardix({ onLogout }: GuardixProps) {
                         consultasRealizadas={consultasRealizadas}
                         limiteCota={5}
                         onAbrirModalPro={() => setModalProAberto(true)}
-                        onReportarAmeaca={() => {
+                        onReportarAmeaca={(ameaca) => {
+                            setAmeacaParaReportar(ameaca);
                             setModalReporteAberto(true);
                         }}
                         onLogout={onLogout}
@@ -198,11 +212,24 @@ function Guardix({ onLogout }: GuardixProps) {
                 />
             )}
 
+            <ModalPerfil
+    isOpen={modalPerfilAberto}
+    onClose={() => setModalPerfilAberto(false)}
+    usuario={usuarioLogado}
+/>
+
             <ModalReport
                 isOpen={modalReporteAberto}
-                onClose={() => setModalReporteAberto(false)}
+                onClose={() => {
+                    setModalReporteAberto(false);
+                    setAmeacaParaReportar(null);
+                }}
+                ameacaInicial={ameacaParaReportar}
             />
-
+            <Chatbot
+                plano={usuarioLogado?.plano || "free"}
+                onNavigateToPlanos={handleNavigateToPlanos}
+            />
         </div>
     );
 }
