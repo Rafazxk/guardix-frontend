@@ -4,35 +4,55 @@
 
 /* ---- CSS VARS ---- */
 :root {
-    --bg:         #020617;
-    --surface:    #0b1628;
-    --surface-2:  #0f1f38;
-    --card:       #0d1f36;
-    --border:     #1a2f50;
-    --border-2:   #243a5e;
+    color-scheme: dark;
 
-    --indigo:     #6366f1;
-    --indigo-dim: rgba(99,102,241,.12);
-    --indigo-glow:rgba(99,102,241,.25);
+    --bg: #020617;
+    --surface: #0b1628;
+    --surface-2: #0f1f38;
+    --card: #0d1f36;
+    --border: #1a2f50;
 
-    --danger:     #ef4444;
-    --danger-dim: rgba(239,68,68,.12);
-    --success:    #22c55e;
-    --success-dim:rgba(34,197,94,.12);
-    --warn:       #f59e0b;
-    --warn-dim:   rgba(245,158,11,.12);
+    --text: #e2e8f0;
+    --text-dim: #94a3b8;
+    --text-muted: #64748b;
 
-    --text:       #e2e8f0;
-    --text-dim:   #64748b;
-    --text-muted: #334155;
+    --input-bg: #0f172a;
+    --hover-bg: #1e293b;
 
-    --radius-sm:  8px;
-    --radius:     12px;
-    --radius-lg:  18px;
-    --sidebar-w:  250px;
-    --transition: 0.2s ease;
+    --scrollbar: #334155;
+
+     --sidebar-bg: #020617;
+    --sidebar-text: #94a3b8;
+    --sidebar-text-strong: #e2e8f0;
+    --sidebar-muted: #64748b;
+    --sidebar-hover: #1e293b;
 }
 
+:root[data-theme="light"] {
+    color-scheme: light;
+
+    --bg: #f1f5f9;
+    --surface: #ffffff;
+    --surface-2: #f8fafc;
+    --card: #ffffff;
+    --border: #e2e8f0;
+
+    --text: #0f172a;
+    --text-dim: #475569;
+    --text-muted: #64748b;
+
+    --input-bg: #ffffff;
+    --hover-bg: #f1f5f9;
+
+    --scrollbar: #cbd5e1;
+
+        /* Sidebar */
+    --sidebar-bg: #ffffff;
+    --sidebar-text: #475569;
+    --sidebar-text-strong: #0f172a;
+    --sidebar-muted: #64748b;
+    --sidebar-hover: #f1f5f9;
+}
 
 .corpo-dashboard {
     display: flex;
@@ -40,6 +60,44 @@
     min-height: 100vh;
     background: var(--bg);
 }
+
+:root {
+    --border-2: #334155;
+
+    --indigo: #818cf8;
+    --indigo-dim: rgba(99, 102, 241, 0.12);
+    --indigo-glow: rgba(99, 102, 241, 0.25);
+
+    --danger: #ef4444;
+    --danger-dim: rgba(239, 68, 68, 0.12);
+
+    --success: #22c55e;
+    --success-dim: rgba(34, 197, 94, 0.12);
+
+    --warn: #f59e0b;
+    --warn-dim: rgba(245, 158, 11, 0.12);
+}
+
+:root[data-theme="light"] {
+    --border-2: #cbd5e1;
+
+    --indigo: #4f46e5;
+    --indigo-dim: rgba(79, 70, 229, 0.09);
+    --indigo-glow: rgba(79, 70, 229, 0.2);
+
+    --danger: #dc2626;
+    --danger-dim: rgba(220, 38, 38, 0.09);
+
+    --success: #16a34a;
+    --success-dim: rgba(22, 163, 74, 0.09);
+
+    --warn: #d97706;
+    --warn-dim: rgba(217, 119, 6, 0.09);
+}
+
+
+
+
 
 /* ====================================
    SIDEBAR

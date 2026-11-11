@@ -141,14 +141,14 @@ function FeedGolpes({
         <section className="content-section p-6 space-y-6">
 
             {/* HEADER */}
-            <div className="flex flex-col gap-1 border-b border-slate-800 pb-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-col gap-1 border-b border-[var(--border)] pb-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                    <h1 className="text-2xl font-bold text-slate-100 flex items-center gap-2">
+                    <h1 className="text-2xl font-bold text-[var(--text)] flex items-center gap-2">
                         <i className="fas fa-rss text-indigo-500"></i>
                         Feed de Golpes
                     </h1>
 
-                    <p className="text-sm text-slate-400">
+                    <p className="text-sm text-[var(--text-dim)]">
                         Ameaças reportadas pela comunidade em tempo real
                     </p>
                 </div>
@@ -167,14 +167,14 @@ function FeedGolpes({
 
             {/* ACESSO PREMIUM */}
             {acessoPremiumNegado ? (
-                <div className="p-12 text-center bg-slate-900/60 border border-slate-800 rounded-xl">
+                <div className="p-12 text-center bg-[var(--surface)] border border-[var(--border)] rounded-xl">
                     <i className="fas fa-lock text-4xl text-indigo-400 mb-4"></i>
 
-                    <h2 className="text-xl font-semibold text-slate-100">
+                    <h2 className="text-xl font-semibold text-[var(--text)]">
                         Feed de Golpes
                     </h2>
 
-                    <p className="text-sm text-slate-400 mt-2">
+                    <p className="text-sm text-[var(--text-dim)] mt-2">
                         O monitoramento de ameaças está disponível no Plano Premium.
                     </p>
 
@@ -191,21 +191,21 @@ function FeedGolpes({
                 <>
                     {/* BUSCA */}
                     <div className="relative">
-                        <i className="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-500"></i>
+                        <i className="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)]"></i>
 
                         <input
-                            type="text"
-                            value={busca}
-                            onChange={alterarBusca}
-                            placeholder="Pesquisar link ou telefone..."
-                            className="w-full bg-slate-900/80 border border-slate-800 rounded-xl py-3 pl-11 pr-11 text-sm text-slate-200 placeholder:text-slate-500 outline-none focus:border-indigo-500 transition-all"
-                        />
+    type="text"
+    value={busca}
+    onChange={alterarBusca}
+    placeholder="Pesquisar link ou telefone..."
+    className="w-full bg-[var(--input-bg)] border border-[var(--border)] rounded-xl py-3 pl-11 pr-11 text-sm text-[var(--text)] placeholder:text-[var(--text-muted)] outline-none focus:border-indigo-500 transition-all"
+/>
 
                         {busca && (
                             <button
                                 type="button"
                                 onClick={limparBusca}
-                                className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-200 transition-colors"
+                                className="absolute right-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text)] transition-colors"
                                 aria-label="Limpar busca"
                             >
                                 <i className="fas fa-times"></i>
@@ -228,18 +228,18 @@ function FeedGolpes({
                     >
                         {carregando && (
                             <>
-                                <div className="h-20 bg-slate-800/50 border border-slate-700/50 rounded-xl animate-pulse"></div>
+                                <div className="h-20 bg-[var(--surface-2)] border border-[var(--border)] rounded-xl animate-pulse"></div>
 
-                                <div className="h-20 bg-slate-800/50 border border-slate-700/50 rounded-xl animate-pulse"></div>
+                                <div className="h-20 bg-[var(--surface-2)] border border-[var(--border)] rounded-xl animate-pulse"></div>
                             </>
                         )}
 
                         {/* VAZIO */}
                         {!carregando && !erro && stats.length === 0 && (
-                            <div className="p-12 text-sm text-slate-400 text-center bg-slate-900/60 border border-slate-800 rounded-xl">
-                                <i className="fas fa-shield-alt text-4xl text-slate-600 mb-3"></i>
+                            <div className="p-12 text-sm text-[var(--text-dim)] text-center bg-[var(--surface)] border border-[var(--border)] rounded-xl">
+                                <i className="fas fa-shield-alt text-4xl text-[var(--text-dim)] mb-3"></i>
 
-                                <p className="font-medium text-slate-300">
+                                <p className="font-medium text-[var(--text)]">
                                     {busca
                                         ? "Nenhuma ameaça encontrada para essa busca."
                                         : "Nenhuma ameaça registrada no momento."
@@ -252,7 +252,7 @@ function FeedGolpes({
                             stats.map((item) => (
                                 <div
                                     key={`${item.tipo}-${item.valor}`}
-                                    className="p-4 bg-slate-900/80 hover:bg-slate-900 border border-slate-800 hover:border-slate-700/80 rounded-xl transition-all flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shadow-lg"
+                                    className="p-4 bg-[var(--surface)] hover:bg-[var(--hover-bg)] border border-[var(--border)] hover:border-[var(--border-2)] rounded-xl transition-all flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shadow-lg"
                                 >
                                     <div className="flex items-start gap-3.5">
                                         <div className="p-2.5 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 shrink-0 mt-0.5">
@@ -267,7 +267,7 @@ function FeedGolpes({
 
                                         <div className="space-y-1">
                                             <div className="flex flex-wrap items-center gap-2">
-                                                <span className="font-semibold text-slate-100 text-base break-all">
+                                                <span className="font-semibold text-[var(--text)] text-base break-all">
                                                     {item.valor}
                                                 </span>
 
@@ -276,7 +276,7 @@ function FeedGolpes({
                                                 </span>
                                             </div>
 
-                                            <p className="text-xs text-slate-400">
+                                            <p className="text-xs text-[var(--text-dim)]">
                                                 Identificado e reportado pela rede de segurança Guardix.
                                             </p>
                                         </div>
@@ -303,7 +303,7 @@ function FeedGolpes({
                         !erro &&
                         paginacao.totalPages > 1 && (
                             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
-                                <span className="text-xs text-slate-500">
+                                <span className="text-xs text-[var(--text-muted)]">
                                     {paginacao.total} ameaças encontradas
                                 </span>
 
@@ -319,13 +319,13 @@ function FeedGolpes({
                                                 )
                                             )
                                         }
-                                        className="px-3 py-2 text-xs font-medium text-slate-300 bg-slate-900 border border-slate-800 rounded-lg hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                                       className="px-3 py-2 text-xs font-medium text-[var(--text)] bg-[var(--surface-2)] border border-[var(--border)] rounded-lg hover:bg-[var(--hover-bg)] disabled:opacity-40 disabled:cursor-not-allowed transition-all"
                                     >
                                         <i className="fas fa-chevron-left mr-1"></i>
                                         Anterior
                                     </button>
 
-                                    <span className="px-3 py-2 text-xs font-medium text-slate-400">
+                                    <span className="text-xs font-medium text-[var(--text-dim)]">
                                         Página {paginacao.page} de{" "}
                                         {paginacao.totalPages}
                                     </span>
@@ -343,7 +343,7 @@ function FeedGolpes({
                                                 )
                                             )
                                         }
-                                        className="px-3 py-2 text-xs font-medium text-slate-300 bg-slate-900 border border-slate-800 rounded-lg hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                                       className="px-3 py-2 text-xs font-medium text-[var(--text)] bg-[var(--surface-2)] border border-[var(--border)] rounded-lg hover:bg-[var(--hover-bg)] disabled:opacity-40 disabled:cursor-not-allowed transition-all"
                                     >
                                         Próxima
                                         <i className="fas fa-chevron-right ml-1"></i>

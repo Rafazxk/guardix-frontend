@@ -1,4 +1,3 @@
-
 import { useState, useEffect, type FormEvent } from "react";
 
 type TipoAmeaca = "link" | "telefone";
@@ -149,7 +148,7 @@ function ModalReport({
                 {/* CABEÇALHO */}
                 <div className="flex items-start justify-between gap-4">
                     <div className="min-w-0 flex-1">
-                        <h3 className="modal-title flex items-center gap-2 text-white">
+                        <h3 className="modal-title flex items-center gap-2 text-[var(--text)]">
                             <i
                                 className="fas fa-flag shrink-0 text-red-400"
                                 aria-hidden="true"
@@ -180,18 +179,18 @@ function ModalReport({
                 {/* SUCESSO */}
                 {sucesso ? (
                     <div className="py-10 text-center">
-                        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-500/10 text-green-400">
+                        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-500/10 text-green-500">
                             <i
                                 className="fas fa-circle-check text-3xl"
                                 aria-hidden="true"
                             />
                         </div>
 
-                        <h4 className="mt-4 text-lg font-semibold text-slate-100">
+                        <h4 className="mt-4 text-lg font-semibold text-[var(--text)]">
                             Denúncia registrada!
                         </h4>
 
-                        <p className="mx-auto mt-2 max-w-sm text-sm text-slate-400">
+                        <p className="mx-auto mt-2 max-w-sm text-sm text-[var(--text-dim)]">
                             Obrigado por contribuir. Sua denúncia pode
                             ajudar outras pessoas a reconhecer essa ameaça.
                         </p>
@@ -208,6 +207,7 @@ function ModalReport({
                             </label>
 
                             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                                {/* LINK */}
                                 <button
                                     type="button"
                                     onClick={() => alterarTipo("link")}
@@ -215,8 +215,8 @@ function ModalReport({
                                     aria-pressed={tipo === "link"}
                                     className={`min-w-0 rounded-xl border p-4 text-left transition ${
                                         tipo === "link"
-                                            ? "border-indigo-500/60 bg-indigo-500/10 text-indigo-300"
-                                            : "border-slate-700 bg-slate-900/50 text-slate-400 hover:border-slate-600"
+                                            ? "border-indigo-500/60 bg-indigo-500/10 text-indigo-500"
+                                            : "border-[var(--border)] bg-[var(--surface-2)] text-[var(--text-dim)] hover:border-[var(--border-2)] hover:bg-[var(--hover-bg)]"
                                     }`}
                                 >
                                     <div className="flex min-w-0 items-center gap-3">
@@ -224,7 +224,7 @@ function ModalReport({
                                             className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${
                                                 tipo === "link"
                                                     ? "bg-indigo-500/20"
-                                                    : "bg-slate-800"
+                                                    : "bg-[var(--hover-bg)]"
                                             }`}
                                         >
                                             <i
@@ -245,6 +245,7 @@ function ModalReport({
                                     </div>
                                 </button>
 
+                                {/* TELEFONE */}
                                 <button
                                     type="button"
                                     onClick={() => alterarTipo("telefone")}
@@ -252,8 +253,8 @@ function ModalReport({
                                     aria-pressed={tipo === "telefone"}
                                     className={`min-w-0 rounded-xl border p-4 text-left transition ${
                                         tipo === "telefone"
-                                            ? "border-red-500/60 bg-red-500/10 text-red-300"
-                                            : "border-slate-700 bg-slate-900/50 text-slate-400 hover:border-slate-600"
+                                            ? "border-red-500/60 bg-red-500/10 text-red-500"
+                                            : "border-[var(--border)] bg-[var(--surface-2)] text-[var(--text-dim)] hover:border-[var(--border-2)] hover:bg-[var(--hover-bg)]"
                                     }`}
                                 >
                                     <div className="flex min-w-0 items-center gap-3">
@@ -261,7 +262,7 @@ function ModalReport({
                                             className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${
                                                 tipo === "telefone"
                                                     ? "bg-red-500/20"
-                                                    : "bg-slate-800"
+                                                    : "bg-[var(--hover-bg)]"
                                             }`}
                                         >
                                             <i
@@ -297,7 +298,7 @@ function ModalReport({
 
                             <div className="relative">
                                 <div
-                                    className="pointer-events-none absolute inset-y-0 left-0 z-10 flex w-11 items-center justify-center text-slate-500"
+                                    className="pointer-events-none absolute inset-y-0 left-0 z-10 flex w-11 items-center justify-center text-[var(--text-muted)]"
                                     aria-hidden="true"
                                 >
                                     <i
@@ -347,7 +348,8 @@ function ModalReport({
                                 className="field-label"
                             >
                                 Como essa ameaça aconteceu?
-                                <span className="ml-1 text-slate-500">
+
+                                <span className="ml-1 text-[var(--text-muted)]">
                                     (opcional)
                                 </span>
                             </label>
@@ -378,7 +380,7 @@ function ModalReport({
                         {erro && (
                             <div
                                 role="alert"
-                                className="flex items-start gap-3 rounded-xl border border-red-500/20 bg-red-500/10 p-3 text-sm text-red-400"
+                                className="flex items-start gap-3 rounded-xl border border-red-500/20 bg-red-500/10 p-3 text-sm text-red-500"
                             >
                                 <i
                                     className="fas fa-circle-exclamation mt-0.5 shrink-0"
@@ -392,7 +394,7 @@ function ModalReport({
                         )}
 
                         {/* AVISO */}
-                        <div className="flex items-start gap-3 rounded-xl border border-slate-800 bg-slate-900/60 p-3 text-xs text-slate-400">
+                        <div className="flex items-start gap-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-3 text-xs text-[var(--text-dim)]">
                             <i
                                 className="fas fa-shield-halved mt-0.5 shrink-0 text-indigo-400"
                                 aria-hidden="true"

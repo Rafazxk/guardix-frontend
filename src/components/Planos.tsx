@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import ModalPagamento from "./ModalPagamento";
 
@@ -127,7 +126,7 @@ function Planos({ onLogout, planoAtual }: PlanosProps) {
     };
 
     const badgePlanoAtual = (
-        <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-emerald-400/30 bg-emerald-400/10 px-3 py-1.5 text-xs font-bold text-emerald-300">
+        <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-emerald-400/30 bg-emerald-400/10 px-3 py-1.5 text-xs font-bold text-emerald-500">
             <i className="fas fa-check-circle" aria-hidden="true" />
             SEU PLANO ATUAL
         </div>
@@ -142,9 +141,10 @@ function Planos({ onLogout, planoAtual }: PlanosProps) {
                 </p>
             </div>
 
+            {/* PERIODICIDADE */}
             <div className="mt-8 flex justify-center">
                 <div
-                    className="flex items-center rounded-2xl border border-slate-700 bg-slate-900 p-1.5 shadow-lg"
+                    className="flex items-center rounded-2xl border border-[var(--border)] bg-[var(--surface-2)] p-1.5 shadow-lg"
                     role="group"
                     aria-label="Periodicidade do pagamento"
                 >
@@ -155,7 +155,7 @@ function Planos({ onLogout, planoAtual }: PlanosProps) {
                         className={`rounded-xl px-7 py-3 font-semibold transition-all duration-200 ${
                             periodo === "mensal"
                                 ? "bg-cyan-400 text-slate-950 shadow-md shadow-cyan-400/20"
-                                : "text-slate-400 hover:text-white"
+                                : "text-[var(--text-dim)] hover:bg-[var(--hover-bg)] hover:text-[var(--text)]"
                         }`}
                     >
                         Mensal
@@ -168,7 +168,7 @@ function Planos({ onLogout, planoAtual }: PlanosProps) {
                         className={`rounded-xl px-7 py-3 font-semibold transition-all duration-200 ${
                             periodo === "anual"
                                 ? "bg-cyan-400 text-slate-950 shadow-md shadow-cyan-400/20"
-                                : "text-slate-400 hover:text-white"
+                                : "text-[var(--text-dim)] hover:bg-[var(--hover-bg)] hover:text-[var(--text)]"
                         }`}
                     >
                         Anual
@@ -176,53 +176,59 @@ function Planos({ onLogout, planoAtual }: PlanosProps) {
                 </div>
             </div>
 
+            {/* CARDS DOS PLANOS */}
             <div className="mx-auto mt-10 grid max-w-5xl grid-cols-1 gap-6 lg:grid-cols-2">
+
                 {/* PLANO PRO */}
                 <div
-                    className={`rounded-2xl border bg-slate-900 p-6 shadow-lg ${
+                    className={`rounded-2xl border bg-[var(--card)] p-6 shadow-lg ${
                         proEhAtual
                             ? "border-emerald-400/50"
-                            : "border-slate-700"
+                            : "border-[var(--border)]"
                     }`}
                 >
                     {proEhAtual && badgePlanoAtual}
 
                     <div className="mb-6">
-                        <h2 className="text-2xl font-bold text-white">
+                        <h2 className="text-2xl font-bold text-[var(--text)]">
                             Pro
                         </h2>
-                        <p className="mt-2 text-sm text-slate-400">
+                        <p className="mt-2 text-sm text-[var(--text-dim)]">
                             Proteção avançada para uso individual.
                         </p>
                     </div>
 
                     <div className="mb-6">
-                        <span className="text-4xl font-bold text-white">
+                        <span className="text-4xl font-bold text-[var(--text)]">
                             R$ {precoPro}
                         </span>
-                        <span className="ml-2 text-slate-400">
+                        <span className="ml-2 text-[var(--text-muted)]">
                             {periodo === "mensal" ? "/mês" : "/ano"}
                         </span>
                     </div>
 
                     <div className="mb-6 space-y-3">
-                        <div className="flex items-center gap-3 text-sm text-slate-300">
+                        <div className="flex items-center gap-3 text-sm text-[var(--text-dim)]">
                             <span className="text-cyan-400">✓</span>
                             <span>Verificação de Links Falsos ilimitados</span>
                         </div>
-                        <div className="flex items-center gap-3 text-sm text-slate-300">
+
+                        <div className="flex items-center gap-3 text-sm text-[var(--text-dim)]">
                             <span className="text-cyan-400">✓</span>
                             <span>Verificação de Números Desconhecidos ilimitados</span>
                         </div>
-                        <div className="flex items-center gap-3 text-sm text-slate-300">
+
+                        <div className="flex items-center gap-3 text-sm text-[var(--text-dim)]">
                             <span className="text-cyan-400">✓</span>
                             <span>Verificação de Conversas Suspeitas ilimitadas</span>
                         </div>
-                        <div className="flex items-center gap-3 text-sm text-slate-300">
+
+                        <div className="flex items-center gap-3 text-sm text-[var(--text-dim)]">
                             <span className="text-cyan-400">✓</span>
                             <span>Históricos ilimitados</span>
                         </div>
-                        <div className="flex items-center gap-3 text-sm text-slate-300">
+
+                        <div className="flex items-center gap-3 text-sm text-[var(--text-dim)]">
                             <span className="text-cyan-400">✓</span>
                             <span>Resposta da IA mais detalhada e explicativa</span>
                         </div>
@@ -234,7 +240,7 @@ function Planos({ onLogout, planoAtual }: PlanosProps) {
                         onClick={() => abrirPagamento("pro")}
                         className={`w-full rounded-xl px-5 py-3 font-semibold transition ${
                             proEhAtual
-                                ? "cursor-not-allowed border border-emerald-400/30 bg-emerald-400/10 text-emerald-300"
+                                ? "cursor-not-allowed border border-emerald-400/30 bg-emerald-400/10 text-emerald-500"
                                 : "bg-indigo-600 text-white hover:bg-indigo-500 disabled:cursor-wait disabled:opacity-60"
                         }`}
                     >
@@ -246,7 +252,7 @@ function Planos({ onLogout, planoAtual }: PlanosProps) {
 
                 {/* PLANO PREMIUM+ */}
                 <div
-                    className={`relative rounded-2xl border bg-slate-900 p-6 shadow-xl shadow-cyan-400/20 ring-1 ring-cyan-400/10 ${
+                    className={`relative rounded-2xl border bg-[var(--card)] p-6 shadow-xl shadow-cyan-400/10 ring-1 ring-cyan-400/10 ${
                         premiumEhAtual
                             ? "border-emerald-400/50"
                             : "border-cyan-400/60"
@@ -259,40 +265,45 @@ function Planos({ onLogout, planoAtual }: PlanosProps) {
                     </div>
 
                     <div className="mb-6">
-                        <h2 className="text-2xl font-bold text-cyan-400">
+                        <h2 className="text-2xl font-bold text-cyan-500">
                             Premium+
                         </h2>
-                        <p className="mt-2 text-sm text-slate-400">
+
+                        <p className="mt-2 text-sm text-[var(--text-dim)]">
                             Proteção completa para usuários e empresas.
                         </p>
-                        <div className="mt-4 inline-flex items-center rounded-lg border border-cyan-400/20 bg-cyan-400/5 px-3 py-2 text-xs font-medium text-cyan-300">
+
+                        <div className="mt-4 inline-flex items-center rounded-lg border border-cyan-400/20 bg-cyan-400/5 px-3 py-2 text-xs font-medium text-cyan-500">
                             ✓ Tudo do plano Pro + recursos exclusivos
                         </div>
                     </div>
 
                     <div className="mb-6">
-                        <span className="text-4xl font-bold text-white">
+                        <span className="text-4xl font-bold text-[var(--text)]">
                             R$ {precoPremium}
                         </span>
-                        <span className="ml-2 text-slate-400">
+                        <span className="ml-2 text-[var(--text-muted)]">
                             {periodo === "mensal" ? "/mês" : "/ano"}
                         </span>
                     </div>
 
                     <div className="mb-6 space-y-3">
-                        <div className="flex items-center gap-3 text-sm text-slate-300">
+                        <div className="flex items-center gap-3 text-sm text-[var(--text-dim)]">
                             <span className="text-cyan-400">✓</span>
                             <span>Feed de Golpes em Tempo Real com Monitoramento ativo</span>
                         </div>
-                        <div className="flex items-center gap-3 text-sm text-slate-300">
+
+                        <div className="flex items-center gap-3 text-sm text-[var(--text-dim)]">
                             <span className="text-cyan-400">✓</span>
                             <span>API de gerenciamento e prevenção contra golpes para empresas</span>
                         </div>
-                        <div className="flex items-center gap-3 text-sm text-slate-300">
+
+                        <div className="flex items-center gap-3 text-sm text-[var(--text-dim)]">
                             <span className="text-cyan-400">✓</span>
                             <span>Relatórios mais completos e atividade de segurança avançada</span>
                         </div>
-                        <div className="flex items-center gap-3 text-sm text-slate-300">
+
+                        <div className="flex items-center gap-3 text-sm text-[var(--text-dim)]">
                             <span className="text-cyan-400">✓</span>
                             <span>Chatbot de autoatendimento ilimitado e avançado</span>
                         </div>
@@ -304,7 +315,7 @@ function Planos({ onLogout, planoAtual }: PlanosProps) {
                         onClick={() => abrirPagamento("premium")}
                         className={`w-full rounded-xl px-5 py-3 font-semibold transition ${
                             premiumEhAtual
-                                ? "cursor-not-allowed border border-emerald-400/30 bg-emerald-400/10 text-emerald-300"
+                                ? "cursor-not-allowed border border-emerald-400/30 bg-emerald-400/10 text-emerald-500"
                                 : "bg-cyan-400 text-slate-950 hover:bg-cyan-300 disabled:cursor-wait disabled:opacity-60"
                         }`}
                     >
@@ -318,38 +329,41 @@ function Planos({ onLogout, planoAtual }: PlanosProps) {
             {/* COMPARAÇÃO DOS PLANOS */}
             <div className="mx-auto mt-12 max-w-5xl">
                 <div className="mb-6 text-center">
-                    <h2 className="text-2xl font-bold text-white">
+                    <h2 className="text-2xl font-bold text-[var(--text)]">
                         Compare os planos
                     </h2>
-                    <p className="mt-2 text-sm text-slate-400">
+
+                    <p className="mt-2 text-sm text-[var(--text-dim)]">
                         Veja as diferenças entre o Pro e o Premium+.
                     </p>
                 </div>
 
-                <div className="overflow-hidden rounded-2xl border border-slate-700 bg-slate-900 shadow-lg">
-                    <div className="grid grid-cols-3 border-b border-slate-700">
-                        <div className="p-4 text-sm font-semibold text-slate-400">
+                <div className="overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--card)] shadow-lg">
+                    <div className="grid grid-cols-3 border-b border-[var(--border)]">
+                        <div className="p-4 text-sm font-semibold text-[var(--text-muted)]">
                             Recursos
                         </div>
-                        <div className="p-4 text-center text-sm font-semibold text-white">
+
+                        <div className="p-4 text-center text-sm font-semibold text-[var(--text)]">
                             Pro
                             {proEhAtual && (
-                                <div className="mt-1 text-xs text-emerald-300">
+                                <div className="mt-1 text-xs text-emerald-500">
                                     Plano atual
                                 </div>
                             )}
                         </div>
-                        <div className="p-4 text-center text-sm font-semibold text-cyan-400">
+
+                        <div className="p-4 text-center text-sm font-semibold text-cyan-500">
                             Premium+
                             {premiumEhAtual && (
-                                <div className="mt-1 text-xs text-emerald-300">
+                                <div className="mt-1 text-xs text-emerald-500">
                                     Plano atual
                                 </div>
                             )}
                         </div>
                     </div>
 
-                    <div className="divide-y divide-slate-700">
+                    <div className="divide-y divide-[var(--border)]">
                         {[
                             {
                                 recurso: "Verificação de Links Falsos ilimitados",
@@ -401,9 +415,10 @@ function Planos({ onLogout, planoAtual }: PlanosProps) {
                                 key={item.recurso}
                                 className="grid grid-cols-3"
                             >
-                                <div className="p-4 text-sm text-slate-300">
+                                <div className="p-4 text-sm text-[var(--text-dim)]">
                                     {item.recurso}
                                 </div>
+
                                 <div
                                     className="p-4 text-center"
                                     aria-label={
@@ -413,11 +428,12 @@ function Planos({ onLogout, planoAtual }: PlanosProps) {
                                     }
                                 >
                                     {item.pro ? (
-                                        <span className="text-cyan-400">✓</span>
+                                        <span className="text-cyan-500">✓</span>
                                     ) : (
-                                        <span className="text-slate-600">—</span>
+                                        <span className="text-[var(--text-muted)]">—</span>
                                     )}
                                 </div>
+
                                 <div
                                     className="p-4 text-center"
                                     aria-label={
@@ -427,9 +443,9 @@ function Planos({ onLogout, planoAtual }: PlanosProps) {
                                     }
                                 >
                                     {item.premium ? (
-                                        <span className="text-cyan-400">✓</span>
+                                        <span className="text-cyan-500">✓</span>
                                     ) : (
-                                        <span className="text-slate-600">—</span>
+                                        <span className="text-[var(--text-muted)]">—</span>
                                     )}
                                 </div>
                             </div>

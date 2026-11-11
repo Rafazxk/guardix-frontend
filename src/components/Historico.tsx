@@ -102,36 +102,40 @@ function Historico({
         <section id="secao-historico" className="w-full max-w-full px-2 sm:px-4 py-4">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6">
                 <div>
-                    <h1 className="text-xl sm:text-2xl font-bold text-slate-100">Histórico</h1>
-                    <p className="text-xs sm:text-sm text-slate-400">Registros de suas análises</p>
+             <h1 className="text-xl sm:text-2xl font-bold text-[var(--text)]">
+    Histórico
+</h1>
+<p className="text-xs sm:text-sm text-[var(--text-dim)]">
+    Registros de suas análises
+</p>
                 </div>
 
                 <div className="flex items-center gap-1.5 overflow-x-auto pb-2 sm:pb-0 scrollbar-none">
                     <button
                         type="button"
                         onClick={() => alterarFiltro("todos")}
-                        className={`px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium whitespace-nowrap transition-colors ${filtro === "todos" ? "bg-indigo-600 text-white" : "bg-slate-900 text-slate-400 hover:bg-slate-800"}`}
+                        className={`px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium whitespace-nowrap transition-colors ${filtro === "todos" ? "bg-indigo-600 text-white" : "bg-[var(--surface-2)] text-[var(--text-dim)] hover:bg-[var(--hover-bg)]"}`}
                     >
                         Todos
                     </button>
                     <button
                         type="button"
                         onClick={() => alterarFiltro("link")}
-                        className={`px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium whitespace-nowrap transition-colors flex items-center gap-1.5 ${filtro === "link" ? "bg-indigo-600 text-white" : "bg-slate-900 text-slate-400 hover:bg-slate-800"}`}
+                        className={`px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium whitespace-nowrap transition-colors flex items-center gap-1.5 ${filtro === "link" ? "bg-indigo-600 text-white" : "bg-[var(--surface-2)] text-[var(--text-dim)] hover:bg-[var(--hover-bg)]"}`}
                     >
                         <i className="fas fa-link"></i> Link
                     </button>
                     <button
                         type="button"
                         onClick={() => alterarFiltro("telefone")}
-                        className={`px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium whitespace-nowrap transition-colors flex items-center gap-1.5 ${filtro === "telefone" ? "bg-indigo-600 text-white" : "bg-slate-900 text-slate-400 hover:bg-slate-800"}`}
+                        className={`px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium whitespace-nowrap transition-colors flex items-center gap-1.5 ${filtro === "telefone" ? "bg-indigo-600 text-white" : "bg-[var(--surface-2)] text-[var(--text-dim)] hover:bg-[var(--hover-bg)]"}`}
                     >
                         <i className="fas fa-phone"></i> Tel
                     </button>
                     <button
                         type="button"
                         onClick={() => alterarFiltro("print")}
-                        className={`px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium whitespace-nowrap transition-colors flex items-center gap-1.5 ${filtro === "print" ? "bg-indigo-600 text-white" : "bg-slate-900 text-slate-400 hover:bg-slate-800"}`}
+                       className={`px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium whitespace-nowrap transition-colors flex items-center gap-1.5 ${filtro === "print" ? "bg-indigo-600 text-white" : "bg-[var(--surface-2)] text-[var(--text-dim)] hover:bg-[var(--hover-bg)]"}`}
                     >
                         <i className="fas fa-image"></i> Print
                     </button>
@@ -144,10 +148,10 @@ function Historico({
                 </div>
             )}
 
-            <div className="w-full overflow-x-auto rounded-xl border border-slate-800 bg-slate-950 shadow-sm">
+           <div className="w-full overflow-x-auto rounded-xl border border-[var(--border)] bg-[var(--surface)] shadow-sm">
                 <table className="w-full text-left border-collapse text-xs sm:text-sm min-w-[500px]">
                     <thead>
-                        <tr className="border-b border-slate-800 text-slate-400 font-mono text-[0.7rem] uppercase tracking-wider">
+                        <tr className="border-b border-[var(--border)] text-[var(--text-dim)] font-mono text-[0.7rem] uppercase tracking-wider">
                             <th className="px-4 py-3">Data</th>
                             <th className="px-4 py-3">Tipo</th>
                             <th className="px-4 py-3">Alvo</th>
@@ -155,10 +159,10 @@ function Historico({
                         </tr>
                     </thead>
 
-                    <tbody className="divide-y divide-slate-800/60 text-slate-300">
+                    <tbody className="divide-y divide-[var(--border)] text-[var(--text)]">
                         {carregando && (
                             <tr>
-                                <td colSpan={4} className="text-center py-8 text-slate-500">
+                                <td colSpan={4} className={`px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium whitespace-nowrap transition-colors flex items-center gap-1.5 ${filtro === "print" ? "bg-indigo-600 text-white" : "bg-[var(--surface-2)] text-[var(--text-dim)] hover:bg-[var(--hover-bg)]"}`}>
                                     Carregando histórico...
                                 </td>
                             </tr>
@@ -166,7 +170,7 @@ function Historico({
 
                         {!carregando && !erro && historicoFiltrado.length === 0 && (
                             <tr>
-                                <td colSpan={4} className="text-center py-8 text-slate-500">
+                                <td colSpan={4} className={`px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium whitespace-nowrap transition-colors flex items-center gap-1.5 ${filtro === "print" ? "bg-indigo-600 text-white" : "bg-[var(--surface-2)] text-[var(--text-dim)] hover:bg-[var(--hover-bg)]"}`}>
                                     Nenhum registro encontrado para este filtro.
                                 </td>
                             </tr>
@@ -178,8 +182,11 @@ function Historico({
                                 const textoStatus = formatarStatus(item.status);
 
                                 return (
-                                    <tr key={item.id || `${textoAlvo}-${index}`} className="hover:bg-slate-900/50 transition-colors">
-                                        <td className="px-4 py-3.5 whitespace-nowrap text-slate-400">{item.data}</td>
+                                    <tr
+    key={item.id || `${textoAlvo}-${index}`}
+    className="hover:bg-[var(--hover-bg)] transition-colors"
+>
+                                        <td className="px-4 py-3.5 whitespace-nowrap text-[var(--text-dim)]">{item.data}</td>
                                         
                                         <td className="px-4 py-3.5 whitespace-nowrap">
                                             {item.tipo === "link" && (
@@ -211,13 +218,17 @@ function Historico({
                                         </td>
 
                                         <td className="px-4 py-3.5 max-w-[200px] sm:max-w-md truncate">
-                                            <span className="text-slate-200" title={textoAlvo}>
+                                            <span className="text-[var(--text)]" title={textoAlvo}>
                                                 {textoAlvo}
                                             </span>
                                         </td>
 
                                         <td className="px-4 py-3.5 whitespace-normal">
-                                            <span className={`inline-flex items-center rounded-md px-2 py-1 text-[0.7rem] sm:text-xs font-semibold ${textoStatus.toLowerCase().includes('alto risco') ? 'bg-red-950 text-red-400 border border-red-800/50' : 'bg-slate-800 text-slate-300'}`}>
+                                            <span className={`inline-flex items-center rounded-md px-2 py-1 text-[0.7rem] sm:text-xs font-semibold ${
+    textoStatus.toLowerCase().includes("alto risco")
+        ? "bg-red-950 text-red-400 border border-red-800/50"
+        : "bg-[var(--surface-2)] text-[var(--text)] border border-[var(--border)]"
+}`}>
                                                 {textoStatus}
                                             </span>
                                         </td>

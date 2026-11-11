@@ -8,8 +8,10 @@ import Relatorios from "../components/Relatorios";
 import Planos from "../components/Planos";
 import ModalPro from "../components/ModalPro";
 import ModalReport from "../components/ModalReport";
-import Chatbot from "../components/Chatbot";
+import Chatbot from "../components/chatbot/Chatbot";
 import ModalPerfil from "../components/ModalPerfil";
+import AdminUsuarios from "../components/AdminUsuarios";
+import ModalConfiguracoes from "../components/ModalConfiguracoes";
 
 interface GuardixProps {
     onLogout: () => void;
@@ -31,6 +33,8 @@ function Guardix({ onLogout }: GuardixProps) {
     const [consultasRealizadas] = useState(0);
     const [modalPerfilAberto, setModalPerfilAberto] = useState(false);
     const [usuarioLogado, setUsuarioLogado] = useState<any>(undefined);
+    const [modalConfiguracoesAberto, setModalConfiguracoesAberto] =
+        useState(false);
     const [ameacaParaReportar, setAmeacaParaReportar] =
         useState<AmeacaParaReportar | null>(null);
 
@@ -103,14 +107,14 @@ function Guardix({ onLogout }: GuardixProps) {
             setMenuAberto(false);
         }
     };
-    
+
     return (
         <div className="corpo-dashboard">
-         {usuarioLogado?.plano?.toLowerCase() !== "premium+" &&
-    usuarioLogado?.plano?.toLowerCase() !== "premium" && (
-        <button
-            type="button"
-            className="
+            {usuarioLogado?.plano?.toLowerCase() !== "premium+" &&
+                usuarioLogado?.plano?.toLowerCase() !== "premium" && (
+                    <button
+                        type="button"
+                        className="
                 fixed right-6 top-4 z-[1050]
                 flex items-center gap-2
                 rounded-lg
@@ -125,14 +129,14 @@ function Guardix({ onLogout }: GuardixProps) {
                 hover:bg-slate-800
                 hover:text-amber-300
             "
-            onClick={() => setSecaoAtiva("planos")}
-        >
-            <i className="fas fa-arrow-up" aria-hidden="true"></i>
-            {usuarioLogado?.plano?.toLowerCase() === "pro"
-                ? "Conheça o Premium+"
-                : "Atualize seu plano"}
-        </button>
-    )}
+                        onClick={() => setSecaoAtiva("planos")}
+                    >
+                        <i className="fas fa-arrow-up" aria-hidden="true"></i>
+                        {usuarioLogado?.plano?.toLowerCase() === "pro"
+                            ? "Conheça o Premium+"
+                            : "Atualize seu plano"}
+                    </button>
+                )}
             <button
                 type="button"
                 onClick={() => setMenuAberto(true)}
@@ -155,17 +159,22 @@ function Guardix({ onLogout }: GuardixProps) {
             </button>
 
             <Sidebar
-    usuario={usuarioLogado}
-    menuAberto={menuAberto}
-    setMenuAberto={setMenuAberto}
-    secaoAtiva={secaoAtiva}
-    navegar={navegar}
-    abrirModalPro={() => setModalProAberto(true)}
-    abrirModalReporte={() => setModalReporteAberto(true)}
-    abrirModalPerfil={() => setModalPerfilAberto(true)}
-/>
+                usuario={usuarioLogado}
+                menuAberto={menuAberto}
+                setMenuAberto={setMenuAberto}
+                secaoAtiva={secaoAtiva}
+                navegar={navegar}
+                abrirModalPro={() => setModalProAberto(true)}
+                abrirModalReporte={() => setModalReporteAberto(true)}
+                abrirModalPerfil={() => setModalPerfilAberto(true)}
+                abrirModalConfiguracoes={() => setModalConfiguracoesAberto(true)}
+            />
 
             <main className="main-content">
+
+                {secaoAtiva === "admin-usuarios" && usuarioLogado?.is_admin && (
+                    <AdminUsuarios onLogout={onLogout} />
+                )}
 
                 {secaoAtiva === "verificador" && (
                     <Verificador
@@ -213,10 +222,20 @@ function Guardix({ onLogout }: GuardixProps) {
             )}
 
             <ModalPerfil
-    isOpen={modalPerfilAberto}
-    onClose={() => setModalPerfilAberto(false)}
-    usuario={usuarioLogado}
-/>
+                isOpen={modalPerfilAberto}
+                onClose={() => setModalPerfilAberto(false)}
+                usuario={usuarioLogado}
+            />
+            <ModalPerfil
+                isOpen={modalPerfilAberto}
+                onClose={() => setModalPerfilAberto(false)}
+                usuario={usuarioLogado}
+            />
+
+            <ModalConfiguracoes
+                isOpen={modalConfiguracoesAberto}
+                onClose={() => setModalConfiguracoesAberto(false)}
+            />
 
             <ModalReport
                 isOpen={modalReporteAberto}

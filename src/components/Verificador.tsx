@@ -55,10 +55,16 @@ function Verificador({
     const [carregando, setCarregando] = useState(false);
     const [resultado, setResultado] = useState<any>(null);
     const [erro, setErro] = useState("");
+    const [estadoVoz, setEstadoVoz] = useState<"parado" | "falando" | "pausado">("parado");
     const [ameacaAnalisada, setAmeacaAnalisada] = useState<{
         tipo: "link" | "telefone" | "print";
         valor: string;
     } | null>(null);
+    // Interrompe a leitura de voz quando o componente é desmontado.
+    useEffect(() => {
+        return () => window.speechSynthesis?.cancel();
+    }, []);
+
     // Gerencia a criação e limpeza da URL de preview da imagem
     useEffect(() => {
         if (!arquivo) {
@@ -95,6 +101,8 @@ function Verificador({
             return;
         }
 
+        window.speechSynthesis?.cancel();
+        setEstadoVoz("parado");
         setErro("");
         setResultado(null);
         setCarregando(true);
@@ -210,6 +218,87 @@ function Verificador({
             cor: "#eab308"
         };
     }) || [];
+
+    const textoParaOuvir = [
+        `Resultado da análise de ${ameacaAnalisada?.tipo === "print" ? "imagem" : ameacaAnalisada?.tipo === "telefone" ? "telefone" : "link"}.`,
+        `Classificação: ${resultado?.classificacao || (isAltaAmeaca ? "Risco crítico" : isPerigo ? "Alto risco" : "Seguro")}.`,
+        `Pontuação de risco: ${rawScore} de 100.`,
+        resultado?.conclusao ? `Recomendação: ${resultado.conclusao}` : "",
+        resultado?.analiseDetalhadaIa ? `Análise detalhada: ${resultado.analiseDetalhadaIa}` : "",
+        pontosAtencao.length ? `Pontos de atenção: ${pontosAtencao.map((ponto: { texto: string }) => ponto.texto).join(". ")}` : "",
+        resultado?.regrasVioladas?.length
+            ? `Regras identificadas: ${resultado.regrasVioladas.map((regra: { mensagem?: string }) => regra.mensagem).filter(Boolean).join(". ")}`
+            : "",
+    ].filter(Boolean).join(" ");
+
+    const ouvirAnalise = () => {
+        if (!("speechSynthesis" in window)) {
+            setErro("A leitura em voz não é compatível com este navegador.");
+            return;
+        }
+
+        if (!textoParaOuvir.trim()) {
+            setErro("Não há informações disponíveis para leitura. Faça uma análise primeiro.");
+            return;
+        }
+
+        const sintetizador = window.speechSynthesis;
+
+        if (estadoVoz === "falando") {
+            sintetizador.pause();
+            setEstadoVoz("pausado");
+            return;
+        }
+
+        if (estadoVoz === "pausado") {
+            sintetizador.resume();
+            setEstadoVoz("falando");
+            return;
+        }
+
+        setErro("");
+        sintetizador.cancel();
+        setEstadoVoz("parado");
+
+        // Alguns navegadores precisam de um pequeno intervalo após cancel()
+        // para iniciar uma nova fala sem deixar a fila presa.
+        window.setTimeout(() => {
+            const leitura = new SpeechSynthesisUtterance(textoParaOuvir);
+            const vozes = sintetizador.getVoices();
+            const vozPortugues = vozes.find(
+                (voz) => voz.lang.toLowerCase() === "pt-br"
+            ) || vozes.find(
+                (voz) => voz.lang.toLowerCase().startsWith("pt")
+            );
+
+            if (vozPortugues) {
+                leitura.voice = vozPortugues;
+            }
+
+            leitura.lang = "pt-BR";
+            leitura.rate = 1;
+            leitura.pitch = 1;
+
+            leitura.onstart = () => {
+                setErro("");
+                setEstadoVoz("falando");
+            };
+            leitura.onend = () => setEstadoVoz("parado");
+            leitura.onerror = (evento) => {
+                setEstadoVoz("parado");
+                if (evento.error !== "canceled" && evento.error !== "interrupted") {
+                    setErro("Não foi possível reproduzir a análise. Tente clicar em Ouvir análise novamente.");
+                }
+            };
+
+            sintetizador.speak(leitura);
+        }, 100);
+    };
+
+    const pararLeitura = () => {
+        window.speechSynthesis?.cancel();
+        setEstadoVoz("parado");
+    };
 
     const comprimentoMaximo = 267;
     const dashOffsetCalculado = comprimentoMaximo - (comprimentoMaximo * score) / 100;
@@ -479,6 +568,21 @@ function Verificador({
                                         )}
 
                                         <div className="result-actions">
+                                            <button
+                                                type="button"
+                                                className="btn-analyze"
+                                                onClick={ouvirAnalise}
+                                                aria-label={estadoVoz === "falando" ? "Pausar leitura da análise" : estadoVoz === "pausado" ? "Continuar leitura da análise" : "Ouvir análise"}
+                                            >
+                                                <i className={`fas ${estadoVoz === "falando" ? "fa-pause" : estadoVoz === "pausado" ? "fa-play" : "fa-volume-high"}`} aria-hidden="true"></i>
+                                                {estadoVoz === "falando" ? "Pausar leitura" : estadoVoz === "pausado" ? "Continuar leitura" : "Ouvir análise"}
+                                            </button>
+                                            {estadoVoz !== "parado" && (
+                                                <button type="button" className="btn-report" onClick={pararLeitura}>
+                                                    <i className="fas fa-stop" aria-hidden="true"></i>
+                                                    Parar voz
+                                                </button>
+                                            )}
                                             {isPerigo && ameacaAnalisada && ameacaAnalisada.tipo !== "print" && (
                                                 <button
                                                     id="btn-reportar"
