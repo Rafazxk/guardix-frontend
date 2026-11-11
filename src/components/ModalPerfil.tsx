@@ -3,7 +3,7 @@ import { createPortal } from "react-dom";
 interface Usuario {
     nome: string;
     email: string;
-    telefone?: string;
+    telefone?: string | null;
     plano: string;
 }
 
@@ -20,9 +20,9 @@ function ModalPerfil({
 }: ModalPerfilProps) {
     if (!isOpen) return null;
 
-    const nome = usuario?.nome || "Usuário";
-    const telefone = usuario?.telefone || "";
-    const planoOriginal = usuario?.plano?.toLowerCase() || "free";
+    const nome = usuario?.nome?.trim() || "Usuário";
+    const telefone = usuario?.telefone?.trim() || "";
+    const planoOriginal = usuario?.plano?.toLowerCase().trim() || "free";
 
     const planos: Record<string, string> = {
         free: "Free",
@@ -59,28 +59,28 @@ function ModalPerfil({
                 className="
                     relative my-auto w-full max-w-md
                     overflow-hidden rounded-2xl
-                    border border-slate-700
-                    bg-slate-950 shadow-2xl
+                    border border-[var(--border)]
+                    bg-[var(--card)] shadow-2xl
                 "
                 onClick={(e) => e.stopPropagation()}
             >
-                {/* Cabeçalho */}
+                {/* CABEÇALHO */}
                 <div
                     className="
                         flex items-center justify-between
-                        border-b border-slate-800
+                        border-b border-[var(--border)]
                         px-6 py-5
                     "
                 >
                     <div>
                         <h2
                             id="perfil-titulo"
-                            className="text-lg font-bold text-white"
+                            className="text-lg font-bold text-[var(--text)]"
                         >
                             Meu perfil
                         </h2>
 
-                        <p className="mt-1 text-sm text-slate-500">
+                        <p className="mt-1 text-sm text-[var(--text-muted)]">
                             Suas informações no Guardix
                         </p>
                     </div>
@@ -91,9 +91,10 @@ function ModalPerfil({
                         aria-label="Fechar perfil"
                         className="
                             flex h-9 w-9 items-center justify-center
-                            rounded-lg border border-slate-700
-                            text-slate-400 transition-colors
-                            hover:border-slate-500 hover:text-white
+                            rounded-lg border border-[var(--border)]
+                            text-[var(--text-muted)] transition-colors
+                            hover:border-[var(--border-2)]
+                            hover:text-[var(--text)]
                         "
                     >
                         <i className="fas fa-times" />
@@ -101,7 +102,7 @@ function ModalPerfil({
                 </div>
 
                 <div className="space-y-6 p-6">
-                    {/* Foto provisória */}
+                    {/* FOTO PROVISÓRIA */}
                     <div className="flex flex-col items-center">
                         <div
                             className="
@@ -119,8 +120,9 @@ function ModalPerfil({
                                 className="
                                     absolute bottom-0 right-0
                                     flex h-8 w-8 items-center justify-center
-                                    rounded-full border-4 border-slate-950
-                                    bg-slate-800 text-xs text-slate-300
+                                    rounded-full border-4 border-[var(--card)]
+                                    bg-[var(--surface-2)]
+                                    text-xs text-[var(--text-dim)]
                                 "
                                 aria-label="Foto de perfil indisponível"
                             >
@@ -128,23 +130,24 @@ function ModalPerfil({
                             </span>
                         </div>
 
-                        <span className="mt-3 text-xs text-slate-500">
+                        <span className="mt-3 text-xs text-[var(--text-muted)]">
                             Foto de perfil em breve
                         </span>
 
-                        <h3 className="mt-2 text-base font-semibold text-white">
+                        <h3 className="mt-2 text-base font-semibold text-[var(--text)]">
                             {nome}
                         </h3>
                     </div>
 
-                    {/* Informações do usuário */}
+                    {/* INFORMAÇÕES DO USUÁRIO */}
                     <div className="space-y-4">
-                        {/* Nome */}
+                        {/* NOME */}
                         <div>
                             <label
                                 className="
                                     mb-2 block text-xs font-semibold
-                                    uppercase tracking-wider text-slate-500
+                                    uppercase tracking-wider
+                                    text-[var(--text-muted)]
                                 "
                             >
                                 Nome
@@ -153,24 +156,54 @@ function ModalPerfil({
                             <div
                                 className="
                                     flex items-center gap-3 rounded-xl
-                                    border border-slate-800 bg-slate-900/70
+                                    border border-[var(--border)]
+                                    bg-[var(--surface-2)]
                                     px-4 py-3
                                 "
                             >
                                 <i className="fas fa-user w-4 text-center text-indigo-400" />
 
-                                <span className="min-w-0 break-words text-sm text-slate-200">
+                                <span className="min-w-0 break-words text-sm text-[var(--text)]">
                                     {nome}
                                 </span>
                             </div>
                         </div>
 
-                        {/* Telefone */}
+                        {/* EMAIL */}
                         <div>
                             <label
                                 className="
                                     mb-2 block text-xs font-semibold
-                                    uppercase tracking-wider text-slate-500
+                                    uppercase tracking-wider
+                                    text-[var(--text-muted)]
+                                "
+                            >
+                                E-mail
+                            </label>
+
+                            <div
+                                className="
+                                    flex items-center gap-3 rounded-xl
+                                    border border-[var(--border)]
+                                    bg-[var(--surface-2)]
+                                    px-4 py-3
+                                "
+                            >
+                                <i className="fas fa-envelope w-4 text-center text-indigo-400" />
+
+                                <span className="min-w-0 break-all text-sm text-[var(--text)]">
+                                    {usuario?.email || "E-mail não informado"}
+                                </span>
+                            </div>
+                        </div>
+
+                        {/* TELEFONE */}
+                        <div>
+                            <label
+                                className="
+                                    mb-2 block text-xs font-semibold
+                                    uppercase tracking-wider
+                                    text-[var(--text-muted)]
                                 "
                             >
                                 Telefone
@@ -179,7 +212,8 @@ function ModalPerfil({
                             <div
                                 className="
                                     flex items-center gap-3 rounded-xl
-                                    border border-slate-800 bg-slate-900/70
+                                    border border-[var(--border)]
+                                    bg-[var(--surface-2)]
                                     px-4 py-3
                                 "
                             >
@@ -188,8 +222,8 @@ function ModalPerfil({
                                 <span
                                     className={`min-w-0 break-words text-sm ${
                                         telefone
-                                            ? "text-slate-200"
-                                            : "text-slate-500"
+                                            ? "text-[var(--text)]"
+                                            : "text-[var(--text-muted)]"
                                     }`}
                                 >
                                     {telefone || "Telefone não informado"}
@@ -197,12 +231,13 @@ function ModalPerfil({
                             </div>
                         </div>
 
-                        {/* Plano atual */}
+                        {/* PLANO ATUAL */}
                         <div>
                             <label
                                 className="
                                     mb-2 block text-xs font-semibold
-                                    uppercase tracking-wider text-slate-500
+                                    uppercase tracking-wider
+                                    text-[var(--text-muted)]
                                 "
                             >
                                 Plano atual
@@ -211,8 +246,8 @@ function ModalPerfil({
                             <div
                                 className="
                                     flex items-center justify-between gap-3
-                                    rounded-xl border border-slate-800
-                                    bg-slate-900/70 px-4 py-3
+                                    rounded-xl border border-[var(--border)]
+                                    bg-[var(--surface-2)] px-4 py-3
                                 "
                             >
                                 <div className="flex min-w-0 items-center gap-3">
@@ -222,11 +257,11 @@ function ModalPerfil({
                                                 ? "fa-crown text-amber-400"
                                                 : planoPro
                                                     ? "fa-star text-indigo-400"
-                                                    : "fa-shield-halved text-slate-400"
+                                                    : "fa-shield-halved text-[var(--text-muted)]"
                                         } w-4 text-center`}
                                     />
 
-                                    <span className="text-sm font-semibold text-slate-200">
+                                    <span className="text-sm font-semibold text-[var(--text)]">
                                         {plano}
                                     </span>
                                 </div>
@@ -234,23 +269,24 @@ function ModalPerfil({
                                 <span
                                     className="
                                         shrink-0 rounded-full
-                                        border border-slate-700
-                                        bg-slate-800 px-2.5 py-1
+                                        border border-[var(--border)]
+                                        bg-[var(--hover-bg)] px-2.5 py-1
                                         text-[10px] font-semibold
-                                        uppercase tracking-wider text-slate-400
+                                        uppercase tracking-wider
+                                        text-[var(--text-muted)]
                                     "
                                 >
                                     Atual
                                 </span>
                             </div>
 
-                            <p className="mt-2 text-xs text-slate-500">
+                            <p className="mt-2 text-xs text-[var(--text-muted)]">
                                 O plano não pode ser alterado nesta tela.
                             </p>
                         </div>
                     </div>
 
-                    {/* Fechar */}
+                    {/* FECHAR */}
                     <button
                         type="button"
                         onClick={onClose}

@@ -1,448 +1,703 @@
+
 import { useState, type FormEvent } from "react";
 
 interface ModalAutenticacaoProps {
-    aberto: boolean;
-    onFechar: () => void;
-    onLoginSuccess?: () => void;
+  aberto: boolean;
+  onFechar: () => void;
+  onLoginSuccess?: () => void;
 }
 
-// Centraliza a URL da API (Ajuste para a sua variável de ambiente se usar Vite ou Next)
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:10000";
+type Aba = "login" | "cadastro";
+type Etapa = "FORM" | "VERIFICACAO";
+type TipoPessoa = "Pessoa física" | "Empresa";
+
+interface RespostaAutenticacao {
+  message?: string;
+  token?: string;
+  user?: Record<string, unknown>;
+}
+
+const API_URL = (
+  import.meta.env.VITE_API_URL || "http://localhost:10000"
+).replace(/\/$/, "");
+
+const inputClassName =
+  "w-full rounded-xl border border-white/10 bg-[#171b16] px-4 py-3 text-sm text-white outline-none transition placeholder:text-white/35 focus:border-lime-300";
+
+const labelClassName = "mb-2 block text-sm font-medium text-white/80";
 
 function ModalAutenticacao({
-    aberto,
-    onFechar,
-    onLoginSuccess,
+  aberto,
+  onFechar,
+  onLoginSuccess,
 }: ModalAutenticacaoProps) {
-    const [aba, setAba] = useState<"login" | "cadastro">("login");
-    const [etapa, setEtapa] = useState<"FORM" | "VERIFICACAO">("FORM");
+  const [aba, setAba] = useState<Aba>("login");
+  const [etapa, setEtapa] = useState<Etapa>("FORM");
+  const [tipoPessoa, setTipoPessoa] =
+    useState<TipoPessoa>("Pessoa física");
 
-    // Estados da aba de LOGIN
-    const [emailLogin, setEmailLogin] = useState("");
-    const [senhaLogin, setSenhaLogin] = useState("");
+  const [nomeCadastro, setNomeCadastro] = useState("");
+  const [telefoneCadastro, setTelefoneCadastro] = useState("");
+  const [nomeEmpresa, setNomeEmpresa] = useState("");
+  const [emailCadastro, setEmailCadastro] = useState("");
+  const [senhaCadastro, setSenhaCadastro] = useState("");
+  const [confirmarSenha, setConfirmarSenha] = useState("");
 
-    // Estados da aba de CADASTRO
-    const [nomeCadastro, setNomeCadastro] = useState("");
-    const [emailCadastro, setEmailCadastro] = useState("");
-    const [senhaCadastro, setSenhaCadastro] = useState("");
+  const [emailLogin, setEmailLogin] = useState("");
+  const [senhaLogin, setSenhaLogin] = useState("");
 
-    // Estado do código de verificação
-    const [codigo, setCodigo] = useState("");
-    const [carregando, setCarregando] = useState(false);
-    const [mensagemErro, setMensagemErro] = useState("");
+  const [codigo, setCodigo] = useState("");
+  const [carregando, setCarregando] = useState(false);
+  const [mensagemErro, setMensagemErro] = useState("");
 
-    if (!aberto) return null;
+  if (!aberto) return null;
 
-    const emailAtual = aba === "login" ? emailLogin : emailCadastro;
+  const emailAtual = aba === "login" ? emailLogin : emailCadastro;
+  const senhaAtual = aba === "login" ? senhaLogin : senhaCadastro;
 
-    // Utilitário para alternar de aba limpando erros
-    const trocarAba = (novaAba: "login" | "cadastro") => {
-        setAba(novaAba);
-        setMensagemErro("");
-    };
+  function trocarAba(novaAba: Aba) {
+    setAba(novaAba);
+    setEtapa("FORM");
+    setMensagemErro("");
+    setCodigo("");
+  }
 
-    // 1. Envia a solicitação de código OTP para a API
-    const solicitarCodigo = async (email: string) => {
-        setCarregando(true);
-        setMensagemErro("");
+  function formatarTelefone(valor: string) {
+    const numeros = valor.replace(/\D/g, "").slice(0, 11);
 
-        try {
-            const resposta = await fetch(`${API_URL}/verification/send`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    email,
-                    type: "EMAIL_VERIFICATION",
-                }),
-            });
+    if (numeros.length <= 2) {
+      return numeros.length ? `(${numeros}` : "";
+    }
 
-            const dados = await resposta.json();
+    if (numeros.length <= 7) {
+      return `(${numeros.slice(0, 2)}) ${numeros.slice(2)}`;
+    }
 
-            if (!resposta.ok) {
-                throw new Error(dados.message || "Erro ao solicitar código de acesso.");
-            }
+    if (numeros.length <= 10) {
+      return `(${numeros.slice(0, 2)}) ${numeros.slice(2, 6)}-${numeros.slice(6)}`;
+    }
 
-            setEtapa("VERIFICACAO");
-        } catch (erro: any) {
-            setMensagemErro(erro.message || "Erro ao conectar com o servidor.");
-        } finally {
-            setCarregando(false);
-        }
-    };
+    return `(${numeros.slice(0, 2)}) ${numeros.slice(2, 7)}-${numeros.slice(7)}`;
+  }
 
-    // 2. Valida o login com E-mail e Senha antes de enviar o OTP
-    const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  async function lerResposta(resposta: Response): Promise<RespostaAutenticacao> {
+    try {
+      return await resposta.json();
+    } catch {
+      return {};
+    }
+  }
+
+  async function solicitarCodigo(email: string) {
     setCarregando(true);
     setMensagemErro("");
 
     try {
-        const respostaLogin = await fetch(`${API_URL}/users/login`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                email: emailLogin,
-                senha: senhaLogin,
-            }),
-        });
+      const resposta = await fetch(`${API_URL}/verification/send`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email,
+          type: "EMAIL_VERIFICATION",
+        }),
+      });
 
-        const dadosLogin = await respostaLogin.json();
+      const dados = await lerResposta(resposta);
 
-        if (!respostaLogin.ok) {
-            // Se o erro for especificamente e-mail não verificado, redireciona para o OTP
-            if (dadosLogin.message === "E-mail não verificado") {
-                await solicitarCodigo(emailLogin);
-                return;
-            }
-            throw new Error(dadosLogin.message || "E-mail ou senha incorretos.");
-        }
+      if (!resposta.ok) {
+        throw new Error(
+          dados.message || "Não foi possível enviar o código de verificação.",
+        );
+      }
 
-        // Login realizado com sucesso! Armazena o JWT retornado pelo backend
-        if (dadosLogin.token) {
-            localStorage.setItem("guardix_token", dadosLogin.token);
-        }
-        if (dadosLogin.user) {
-            localStorage.setItem("guardix_user", JSON.stringify(dadosLogin.user));
-        }
-
-        if (onLoginSuccess) {
-            onLoginSuccess();
-        }
-
-        onFechar();
-    } catch (erro: any) {
-        setMensagemErro(erro.message || "Erro ao realizar login.");
+      setCodigo("");
+      setEtapa("VERIFICACAO");
+    } catch (erro) {
+      setMensagemErro(
+        erro instanceof Error
+          ? erro.message
+          : "Erro ao conectar com o servidor.",
+      );
     } finally {
-        setCarregando(false);
+      setCarregando(false);
     }
-};
+  }
 
-    // 3. Cadastra o novo usuário e aciona o envio do OTP
-    const handleCadastro = async (e: FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        setCarregando(true);
-        setMensagemErro("");
+  async function concluirLogin(email: string, senha: string) {
+    const resposta = await fetch(`${API_URL}/users/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, senha }),
+    });
 
-        try {
-            const resposta = await fetch(`${API_URL}/users/register`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    nome: nomeCadastro,
-                    email: emailCadastro,
-                    senha: senhaCadastro,
-                }),
-            });
+    const dados = await lerResposta(resposta);
 
-            const dados = await resposta.json();
+    if (!resposta.ok) {
+      throw new Error(
+        dados.message ||
+          "E-mail confirmado, mas não foi possível entrar na conta.",
+      );
+    }
 
-            if (!resposta.ok) {
-                throw new Error(dados.message || "Essa conta ja existe.");
-            }
+    if (!dados.token) {
+      throw new Error("O servidor não retornou o token de autenticação.");
+    }
 
-            await solicitarCodigo(emailCadastro);
-        } catch (erro: any) {
-            setMensagemErro(erro.message || "Erro no processo de cadastro.");
-            setCarregando(false);
-        }
-    };
+    localStorage.setItem("guardix_token", dados.token);
 
-    // 4. Confirma o código digitado e valida a autenticação final
-    const handleConfirmarCodigo = async (
-    e: FormEvent<HTMLFormElement>
-) => {
-    e.preventDefault();
+    if (dados.user) {
+      localStorage.setItem("guardix_user", JSON.stringify(dados.user));
+    }
+
+    onFechar();
+    onLoginSuccess?.();
+  }
+
+  async function handleLogin(evento: FormEvent<HTMLFormElement>) {
+    evento.preventDefault();
     setCarregando(true);
     setMensagemErro("");
 
     try {
-        // 1. Confirma o código de verificação
-        const resposta = await fetch(
-            `${API_URL}/verification/verify-email`,
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    email: emailAtual,
-                    code: codigo,
-                }),
-            }
-        );
+      const resposta = await fetch(`${API_URL}/users/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: emailLogin.trim(),
+          senha: senhaLogin,
+        }),
+      });
 
-        const dados = await resposta.json();
+      const dados = await lerResposta(resposta);
 
-        if (!resposta.ok) {
-            throw new Error(
-                dados.message || "Código inválido ou expirado."
-            );
+      if (!resposta.ok) {
+        if (dados.message === "E-mail não verificado") {
+          await solicitarCodigo(emailLogin.trim());
+          return;
         }
 
-        // 2. O endpoint de verificação NÃO define JWT.
-        // Depois de confirmar o e-mail, fazemos o login normalmente.
-        const loginResp = await fetch(
-            `${API_URL}/users/login`,
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    email: emailAtual,
-                    senha:
-                        aba === "login"
-                            ? senhaLogin
-                            : senhaCadastro,
-                }),
-            }
-        );
+        throw new Error(dados.message || "E-mail ou senha incorretos.");
+      }
 
-        const loginDados = await loginResp.json();
+      if (!dados.token) {
+        throw new Error("O servidor não retornou o token de autenticação.");
+      }
 
-        if (!loginResp.ok) {
-            throw new Error(
-                loginDados.message ||
-                    "E-mail confirmado, mas não foi possível realizar o login."
-            );
-        }
+      localStorage.setItem("guardix_token", dados.token);
 
-        // 3. O JWT deve vir SOMENTE do login
-        if (
-            !loginDados.token ||
-            typeof loginDados.token !== "string"
-        ) {
-            throw new Error(
-                "O servidor não retornou um JWT válido."
-            );
-        }
+      if (dados.user) {
+        localStorage.setItem("guardix_user", JSON.stringify(dados.user));
+      }
 
-        // 4. Salva o JWT válido
-        localStorage.setItem(
-            "guardix_token",
-            loginDados.token
-        );
-
-        // 5. Salva os dados do usuário
-        if (loginDados.user) {
-            localStorage.setItem(
-                "guardix_user",
-                JSON.stringify(loginDados.user)
-            );
-        }
-
-        // 6. Avisa o App que o login terminou
-        if (onLoginSuccess) {
-            onLoginSuccess();
-        }
-
-        // 7. Fecha o modal
-        onFechar();
-
-    } catch (erro: any) {
-        setMensagemErro(
-            erro.message ||
-                "Falha na validação do código."
-        );
+      onFechar();
+      onLoginSuccess?.();
+    } catch (erro) {
+      setMensagemErro(
+        erro instanceof Error ? erro.message : "Erro ao realizar login.",
+      );
     } finally {
-        setCarregando(false);
+      setCarregando(false);
     }
-};
+  }
 
-    const handleVoltarFormulario = () => {
-        setEtapa("FORM");
-        setCodigo("");
-        setMensagemErro("");
-    };
+  async function handleCadastro(evento: FormEvent<HTMLFormElement>) {
+    evento.preventDefault();
+    setMensagemErro("");
 
-    return (
-        <div
-            className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm"
-            onClick={onFechar}
+    if (telefoneCadastro.replace(/\D/g, "").length !== 11) {
+      setMensagemErro(
+        "Informe um telefone celular com DDD e 11 dígitos.",
+      );
+      return;
+    }
+
+    if (senhaCadastro.length < 8) {
+      setMensagemErro("A senha deve ter pelo menos 8 caracteres.");
+      return;
+    }
+
+    if (senhaCadastro !== confirmarSenha) {
+      setMensagemErro("As senhas não coincidem.");
+      return;
+    }
+
+    setCarregando(true);
+
+    try {
+      const resposta = await fetch(`${API_URL}/users/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          nome: nomeCadastro.trim(),
+          telefone: telefoneCadastro.replace(/\D/g, ""),
+          email: emailCadastro.trim(),
+          senha: senhaCadastro,
+          tipo_pessoa: tipoPessoa,
+          ...(tipoPessoa === "Empresa"
+            ? { nome_empresa: nomeEmpresa.trim() }
+            : {}),
+        }),
+      });
+
+      const dados = await lerResposta(resposta);
+
+      if (!resposta.ok) {
+        throw new Error(
+          dados.message || "Não foi possível criar sua conta.",
+        );
+      }
+
+      await solicitarCodigo(emailCadastro.trim());
+    } catch (erro) {
+      setMensagemErro(
+        erro instanceof Error
+          ? erro.message
+          : "Erro durante o cadastro.",
+      );
+    } finally {
+      setCarregando(false);
+    }
+  }
+
+  async function handleConfirmarCodigo(
+    evento: FormEvent<HTMLFormElement>,
+  ) {
+    evento.preventDefault();
+    setCarregando(true);
+    setMensagemErro("");
+
+    try {
+      const resposta = await fetch(
+        `${API_URL}/verification/verify-email`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: emailAtual.trim(),
+            code: codigo.trim(),
+          }),
+        },
+      );
+
+      const dados = await lerResposta(resposta);
+
+      if (!resposta.ok) {
+        throw new Error(
+          dados.message || "Código inválido ou expirado.",
+        );
+      }
+
+      await concluirLogin(emailAtual.trim(), senhaAtual);
+    } catch (erro) {
+      setMensagemErro(
+        erro instanceof Error
+          ? erro.message
+          : "Não foi possível confirmar o código.",
+      );
+    } finally {
+      setCarregando(false);
+    }
+  }
+
+  function voltarParaFormulario() {
+    setEtapa("FORM");
+    setMensagemErro("");
+    setCodigo("");
+  }
+
+function atualizarCodigo(valor: string, indice: number) {
+  const numeros = valor.replace(/\D/g, "");
+
+  if (numeros.length > 1) {
+    setCodigo(numeros.slice(0, 6));
+    return;
+  }
+
+  const novoCodigo = codigo.split("");
+  novoCodigo[indice] = numeros;
+
+  setCodigo(novoCodigo.join("").slice(0, 6));
+}
+
+  return (
+    <div
+      className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto bg-black/75 p-4 backdrop-blur-sm"
+      onMouseDown={(evento) => {
+        if (evento.target === evento.currentTarget && !carregando) {
+          onFechar();
+        }
+      }}
+    >
+      <section
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="titulo-autenticacao"
+        className="relative my-auto w-full max-w-md rounded-3xl border border-white/10 bg-[#101310] p-6 text-white shadow-2xl sm:p-8"
+      >
+        <button
+          type="button"
+          onClick={onFechar}
+          disabled={carregando}
+          aria-label="Fechar janela"
+          className="absolute right-5 top-5 rounded-lg px-3 py-1 text-2xl text-white/50 transition hover:bg-white/5 hover:text-white disabled:opacity-40"
         >
-            <div
-                className="relative w-full max-w-md rounded-3xl border border-slate-700 bg-slate-800 p-8 shadow-[0_24px_60px_rgba(0,0,0,0.5)] animate-[aparecer_0.3s_ease-out]"
-                onClick={(e) => e.stopPropagation()}
-            >
-                <button
-                    type="button"
-                    onClick={onFechar}
-                    aria-label="Fechar"
-                    className="absolute right-5 top-5 flex h-8 w-8 items-center justify-center rounded-lg border border-slate-700 bg-transparent text-xl text-slate-400 transition-all duration-300 hover:border-red-500 hover:text-red-400"
-                >
-                    &times;
-                </button>
+          ×
+        </button>
 
-                {mensagemErro && (
-                    <div className="mb-4 rounded-lg bg-red-500/10 border border-red-500/20 p-3 text-sm text-red-400">
-                        {mensagemErro}
-                    </div>
-                )}
+        <div className="mb-7">
+          <div className="mb-5 flex items-center gap-2">
+            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-lime-300 font-black text-[#101310]">
+              G
+            </span>
+            <span className="text-lg font-bold tracking-tight">
+              guardix<span className="text-lime-300">.</span>
+            </span>
+          </div>
 
-                {etapa === "VERIFICACAO" ? (
-                    <form onSubmit={handleConfirmarCodigo} className="flex flex-col gap-4">
-                        <h3 className="text-xl font-bold text-white">Verificação de E-mail</h3>
-                        <p className="text-sm text-slate-400">
-                            Digite o código de 6 dígitos enviado para <strong>{emailAtual}</strong>:
-                        </p>
+          <p className="mb-2 text-xs font-semibold uppercase tracking-[0.2em] text-lime-300">
+            {etapa === "VERIFICACAO"
+              ? "Confirme seu e-mail"
+              : aba === "login"
+                ? "Bem-vindo de volta"
+                : "Comece com segurança"}
+          </p>
 
-                        <input
-                            type="text"
-                            maxLength={6}
-                            placeholder="000000"
-                            value={codigo}
-                            onChange={(e) => setCodigo(e.target.value)}
-                            required
-                            className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-3 text-center text-2xl font-bold tracking-widest text-white outline-none transition-all focus:border-blue-500"
-                        />
+          <h2
+            id="titulo-autenticacao"
+            className="pr-8 text-2xl font-bold tracking-tight sm:text-3xl"
+          >
+            {etapa === "VERIFICACAO"
+              ? "Só falta confirmar."
+              : aba === "login"
+                ? "Acesse sua conta."
+                : "Crie sua conta."}
+          </h2>
 
-                        <button
-                            type="submit"
-                            disabled={carregando}
-                            className="mt-2 w-full rounded-lg bg-blue-600 px-4 py-3 font-bold text-white transition-all hover:bg-blue-500 disabled:opacity-50"
-                        >
-                            {carregando ? "Validando..." : "Confirmar e Entrar"}
-                        </button>
-
-                        <button
-                            type="button"
-                            onClick={handleVoltarFormulario}
-                            className="text-sm text-slate-400 hover:underline text-center mt-1"
-                        >
-                            Voltar e alterar e-mail
-                        </button>
-                    </form>
-                ) : (
-                    <>
-                        <div className="mb-6 flex gap-6 border-b border-slate-700">
-                            <button
-                                type="button"
-                                onClick={() => trocarAba("login")}
-                                className={`border-b-2 pb-2 font-semibold transition-all duration-300 ${
-                                    aba === "login"
-                                        ? "border-blue-500 text-blue-500"
-                                        : "border-transparent text-slate-400 hover:text-slate-200"
-                                }`}
-                            >
-                                Login
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => trocarAba("cadastro")}
-                                className={`border-b-2 pb-2 font-semibold transition-all duration-300 ${
-                                    aba === "cadastro"
-                                        ? "border-blue-500 text-blue-500"
-                                        : "border-transparent text-slate-400 hover:text-slate-200"
-                                }`}
-                            >
-                                Cadastro
-                            </button>
-                        </div>
-
-                        {aba === "login" && (
-                            <form onSubmit={handleLogin} className="flex flex-col gap-4">
-                                <div className="flex flex-col gap-2">
-                                    <label htmlFor="email-login" className="text-sm font-semibold text-slate-400">
-                                        E-mail
-                                    </label>
-                                    <input
-                                        type="email"
-                                        id="email-login"
-                                        placeholder="seu@email.com"
-                                        value={emailLogin}
-                                        onChange={(e) => setEmailLogin(e.target.value)}
-                                        required
-                                        className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-3 text-white outline-none transition-all placeholder:text-slate-600 focus:border-blue-500"
-                                    />
-                                </div>
-
-                                <div className="flex flex-col gap-2">
-                                    <label htmlFor="senha-login" className="text-sm font-semibold text-slate-400">
-                                        Senha
-                                    </label>
-                                    <input
-                                        type="password"
-                                        id="senha-login"
-                                        placeholder="••••••••"
-                                        value={senhaLogin}
-                                        onChange={(e) => setSenhaLogin(e.target.value)}
-                                        required
-                                        className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-3 text-white outline-none transition-all placeholder:text-slate-600 focus:border-blue-500"
-                                    />
-                                </div>
-
-                                <button
-                                    type="submit"
-                                    disabled={carregando}
-                                    className="mt-2 w-full rounded-lg bg-blue-600 px-4 py-3 font-bold text-white transition-all hover:bg-blue-500 disabled:opacity-50"
-                                >
-                                    {carregando ? "Validando..." : "Entrar na Conta"}
-                                </button>
-                            </form>
-                        )}
-
-                        {aba === "cadastro" && (
-                            <form onSubmit={handleCadastro} className="flex flex-col gap-4">
-                                <div className="flex flex-col gap-2">
-                                    <label htmlFor="nome-cadastro" className="text-sm font-semibold text-slate-400">
-                                        Nome Completo
-                                    </label>
-                                    <input
-                                        type="text"
-                                        id="nome-cadastro"
-                                        placeholder="João Silva"
-                                        value={nomeCadastro}
-                                        onChange={(e) => setNomeCadastro(e.target.value)}
-                                        required
-                                        className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-3 text-white outline-none transition-all placeholder:text-slate-600 focus:border-blue-500"
-                                    />
-                                </div>
-
-                                <div className="flex flex-col gap-2">
-                                    <label htmlFor="email-cadastro" className="text-sm font-semibold text-slate-400">
-                                        E-mail
-                                    </label>
-                                    <input
-                                        type="email"
-                                        id="email-cadastro"
-                                        placeholder="seu@email.com"
-                                        value={emailCadastro}
-                                        onChange={(e) => setEmailCadastro(e.target.value)}
-                                        required
-                                        className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-3 text-white outline-none transition-all placeholder:text-slate-600 focus:border-blue-500"
-                                    />
-                                </div>
-
-                                <div className="flex flex-col gap-2">
-                                    <label htmlFor="senha-cadastro" className="text-sm font-semibold text-slate-400">
-                                        Senha
-                                    </label>
-                                    <input
-                                        type="password"
-                                        id="senha-cadastro"
-                                        placeholder="Crie uma senha forte"
-                                        value={senhaCadastro}
-                                        onChange={(e) => setSenhaCadastro(e.target.value)}
-                                        required
-                                        className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-3 text-white outline-none transition-all placeholder:text-slate-600 focus:border-blue-500"
-                                    />
-                                </div>
-
-                                <button
-                                    type="submit"
-                                    disabled={carregando}
-                                    className="mt-2 w-full rounded-lg bg-blue-600 px-4 py-3 font-bold text-white transition-all hover:bg-blue-500 disabled:opacity-50"
-                                >
-                                    {carregando ? "Criando conta..." : "Criar Minha Conta"}
-                                </button>
-                            </form>
-                        )}
-                    </>
-                )}
-            </div>
+          <p className="mt-2 text-sm leading-6 text-white/55">
+            {etapa === "VERIFICACAO"
+              ? `Enviamos um código para ${emailAtual}.`
+              : aba === "login"
+                ? "Entre para continuar usando o Guardix."
+                : "Conte um pouco sobre você para começarmos."}
+          </p>
         </div>
-    );
+
+        {etapa === "FORM" && (
+          <div className="mb-6 grid grid-cols-2 rounded-xl border border-white/10 bg-[#171b16] p-1">
+            <button
+              type="button"
+              onClick={() => trocarAba("login")}
+              className={`rounded-lg px-3 py-2.5 text-sm font-semibold transition ${
+                aba === "login"
+                  ? "bg-lime-300 text-[#101310]"
+                  : "text-white/55 hover:text-white"
+              }`}
+            >
+              Entrar
+            </button>
+
+            <button
+              type="button"
+              onClick={() => trocarAba("cadastro")}
+              className={`rounded-lg px-3 py-2.5 text-sm font-semibold transition ${
+                aba === "cadastro"
+                  ? "bg-lime-300 text-[#101310]"
+                  : "text-white/55 hover:text-white"
+              }`}
+            >
+              Criar conta
+            </button>
+          </div>
+        )}
+
+        {mensagemErro && (
+          <div
+            role="alert"
+            className="mb-5 rounded-xl border border-red-400/20 bg-red-400/10 px-4 py-3 text-sm leading-5 text-red-200"
+          >
+            {mensagemErro}
+          </div>
+        )}
+
+        {etapa === "VERIFICACAO" ? (
+          <form onSubmit={handleConfirmarCodigo} className="space-y-5">
+            <div>
+  <label className={labelClassName}>
+    Código de verificação
+  </label>
+
+  <div className="flex justify-center gap-2 sm:gap-3">
+    {Array.from({ length: 6 }).map((_, indice) => (
+      <input
+        key={indice}
+        type="text"
+        inputMode="numeric"
+        autoComplete={indice === 0 ? "one-time-code" : "off"}
+        maxLength={1}
+        value={codigo[indice] || ""}
+        onChange={(evento) =>
+          atualizarCodigo(evento.target.value, indice)
+        }
+        onKeyDown={(evento) => {
+          if (
+            evento.key === "Backspace" &&
+            !codigo[indice] &&
+            indice > 0
+          ) {
+            const anterior = document.getElementById(
+              `codigo-${indice - 1}`
+            );
+
+            anterior?.focus();
+          }
+        }}
+        onInput={(evento) => {
+          const input = evento.currentTarget;
+
+          if (input.value && indice < 5) {
+            document.getElementById(
+              `codigo-${indice + 1}`
+            )?.focus();
+          }
+        }}
+        id={`codigo-${indice}`}
+        aria-label={`Dígito ${indice + 1} do código`}
+        className="h-12 w-10 rounded-xl border border-white/10 bg-[#171b16] text-center text-xl font-bold text-white outline-none transition focus:border-lime-300 sm:h-14 sm:w-12"
+        required
+      />
+    ))}
+  </div>
+</div>
+
+            <button
+              type="submit"
+              disabled={carregando || codigo.length !== 6}
+              className="w-full rounded-xl bg-lime-300 px-4 py-3.5 font-bold text-[#101310] transition hover:bg-lime-200 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {carregando ? "Confirmando..." : "Confirmar e continuar"}
+            </button>
+
+            <button
+              type="button"
+              disabled={carregando}
+              onClick={() => solicitarCodigo(emailAtual.trim())}
+              className="w-full py-2 text-sm text-white/60 transition hover:text-lime-300 disabled:opacity-40"
+            >
+              Não recebeu? Enviar outro código
+            </button>
+
+            <button
+              type="button"
+              disabled={carregando}
+              onClick={voltarParaFormulario}
+              className="w-full py-1 text-sm text-white/40 transition hover:text-white"
+            >
+              Voltar
+            </button>
+          </form>
+        ) : aba === "login" ? (
+          <form onSubmit={handleLogin} className="space-y-5">
+            <div>
+              <label htmlFor="email-login" className={labelClassName}>
+                E-mail
+              </label>
+              <input
+                id="email-login"
+                type="email"
+                autoComplete="email"
+                value={emailLogin}
+                onChange={(evento) => setEmailLogin(evento.target.value)}
+                placeholder="voce@exemplo.com"
+                className={inputClassName}
+                required
+              />
+            </div>
+
+            <div>
+              <label htmlFor="senha-login" className={labelClassName}>
+                Senha
+              </label>
+              <input
+                id="senha-login"
+                type="password"
+                autoComplete="current-password"
+                value={senhaLogin}
+                onChange={(evento) => setSenhaLogin(evento.target.value)}
+                placeholder="Digite sua senha"
+                className={inputClassName}
+                required
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={carregando}
+              className="w-full rounded-xl bg-lime-300 px-4 py-3.5 font-bold text-[#101310] transition hover:bg-lime-200 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {carregando ? "Entrando..." : "Entrar na conta"}
+            </button>
+          </form>
+        ) : (
+          <form onSubmit={handleCadastro} className="space-y-4">
+            <div>
+              <label className={labelClassName}>Tipo de conta</label>
+              <div className="grid grid-cols-2 gap-3">
+                {(["Pessoa física", "Empresa"] as TipoPessoa[]).map((tipo) => (
+                  <button
+                    key={tipo}
+                    type="button"
+                    onClick={() => {
+                      setTipoPessoa(tipo);
+                      setMensagemErro("");
+                    }}
+                    className={`rounded-xl border p-3 text-left transition ${
+                      tipoPessoa === tipo
+                        ? "border-lime-300 bg-lime-300/10"
+                        : "border-white/10 bg-[#171b16] hover:border-white/25"
+                    }`}
+                  >
+                    <span className="block text-sm font-semibold">
+                      {tipo}
+                    </span>
+                    <span className="mt-1 block text-xs text-white/45">
+                      {tipo === "Empresa"
+                        ? "Para negócios"
+                        : "Para uso pessoal"}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <label htmlFor="nome-cadastro" className={labelClassName}>
+                {tipoPessoa === "Empresa"
+                  ? "Nome do responsável"
+                  : "Nome completo"}
+              </label>
+              <input
+                id="nome-cadastro"
+                type="text"
+                autoComplete="name"
+                value={nomeCadastro}
+                onChange={(evento) => setNomeCadastro(evento.target.value)}
+                placeholder="Como podemos chamar você?"
+                className={inputClassName}
+                maxLength={150}
+                required
+              />
+            </div>
+
+            {tipoPessoa === "Empresa" && (
+              <div>
+                <label htmlFor="nome-empresa" className={labelClassName}>
+                  Nome da empresa
+                </label>
+                <input
+                  id="nome-empresa"
+                  type="text"
+                  autoComplete="organization"
+                  value={nomeEmpresa}
+                  onChange={(evento) => setNomeEmpresa(evento.target.value)}
+                  placeholder="Nome do seu negócio"
+                  className={inputClassName}
+                  maxLength={150}
+                  required
+                />
+              </div>
+            )}
+
+            <div>
+              <label htmlFor="telefone-cadastro" className={labelClassName}>
+                Telefone celular
+              </label>
+              <input
+                id="telefone-cadastro"
+                type="tel"
+                autoComplete="tel"
+                inputMode="numeric"
+                value={telefoneCadastro}
+                onChange={(evento) =>
+                  setTelefoneCadastro(formatarTelefone(evento.target.value))
+                }
+                placeholder="(81) 99999-9999"
+                className={inputClassName}
+                maxLength={16}
+                required
+              />
+              <p className="mt-1.5 text-xs text-white/40">
+                Inclua o DDD. Não usamos esse campo como senha.
+              </p>
+            </div>
+
+            <div>
+              <label htmlFor="email-cadastro" className={labelClassName}>
+                E-mail
+              </label>
+              <input
+                id="email-cadastro"
+                type="email"
+                autoComplete="email"
+                value={emailCadastro}
+                onChange={(evento) => setEmailCadastro(evento.target.value)}
+                placeholder="voce@exemplo.com"
+                className={inputClassName}
+                maxLength={254}
+                required
+              />
+            </div>
+
+            <div>
+              <label htmlFor="senha-cadastro" className={labelClassName}>
+                Senha
+              </label>
+              <input
+                id="senha-cadastro"
+                type="password"
+                autoComplete="new-password"
+                value={senhaCadastro}
+                onChange={(evento) => setSenhaCadastro(evento.target.value)}
+                placeholder="Mínimo de 8 caracteres"
+                className={inputClassName}
+                minLength={8}
+                required
+              />
+            </div>
+
+            <div>
+              <label htmlFor="confirmar-senha" className={labelClassName}>
+                Confirme sua senha
+              </label>
+              <input
+                id="confirmar-senha"
+                type="password"
+                autoComplete="new-password"
+                value={confirmarSenha}
+                onChange={(evento) => setConfirmarSenha(evento.target.value)}
+                placeholder="Digite a senha novamente"
+                className={inputClassName}
+                minLength={8}
+                required
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={carregando}
+              className="w-full rounded-xl bg-lime-300 px-4 py-3.5 font-bold text-[#101310] transition hover:bg-lime-200 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {carregando ? "Criando sua conta..." : "Criar minha conta"}
+            </button>
+
+            <p className="text-center text-xs leading-5 text-white/40">
+              Ao continuar, você poderá confirmar seu e-mail para ativar a
+              conta.
+            </p>
+          </form>
+        )}
+      </section>
+    </div>
+  );
 }
 
 export default ModalAutenticacao;
-
