@@ -1,9 +1,8 @@
-
 function RodapeLanding() {
   const anoAtual = new Date().getFullYear();
 
   return (
-    <footer className="border-t border-white/10 bg-[#0c0e0c] text-white">
+    <footer className="border-t border-white/10 bg-[#090909] text-white">
       <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-12">
         <div className="grid gap-10 py-10 sm:grid-cols-[1fr_auto] sm:items-start">
           {/* Identidade */}
@@ -11,9 +10,9 @@ function RodapeLanding() {
             <a
               href="#inicio"
               aria-label="Voltar ao início do Guardix"
-              className="inline-flex items-center gap-3"
+              className="inline-flex items-center gap-3 group"
             >
-              <span className="flex h-10 w-10 items-center justify-center rounded-xl border border-lime-300/25 bg-lime-300/10 text-lime-300">
+              <span className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/20 bg-white/[0.06] text-white transition-colors group-hover:bg-white/[0.12]">
                 <svg
                   aria-hidden="true"
                   viewBox="0 0 24 24"
@@ -37,7 +36,7 @@ function RodapeLanding() {
               </span>
 
               <span className="text-xl font-bold tracking-tight">
-                guardix<span className="text-lime-300">.</span>
+                guardix<span className="text-neutral-400">.</span>
               </span>
             </a>
 
@@ -55,21 +54,21 @@ function RodapeLanding() {
 
             <a
               href="#inicio"
-              className="w-fit text-sm text-neutral-300 transition-colors hover:text-lime-300"
+              className="w-fit text-sm text-neutral-300 transition-colors hover:text-white"
             >
               Início
             </a>
 
             <a
               href="#recursos"
-              className="w-fit text-sm text-neutral-300 transition-colors hover:text-lime-300"
+              className="w-fit text-sm text-neutral-300 transition-colors hover:text-white"
             >
               Recursos
             </a>
 
             <a
               href="#educativo"
-              className="w-fit text-sm text-neutral-300 transition-colors hover:text-lime-300"
+              className="w-fit text-sm text-neutral-300 transition-colors hover:text-white"
             >
               Conteúdo educativo
             </a>

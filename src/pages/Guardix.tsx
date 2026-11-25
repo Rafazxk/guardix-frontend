@@ -12,6 +12,7 @@ import Chatbot from "../components/chatbot/Chatbot";
 import ModalPerfil from "../components/ModalPerfil";
 import AdminUsuarios from "../components/AdminUsuarios";
 import ModalConfiguracoes from "../components/ModalConfiguracoes";
+import TutorialGuardix from "../components/tutorial/TutorialGuardix";
 
 interface GuardixProps {
     onLogout: () => void;
@@ -33,6 +34,8 @@ function Guardix({ onLogout }: GuardixProps) {
     const [consultasRealizadas] = useState(0);
     const [modalPerfilAberto, setModalPerfilAberto] = useState(false);
     const [usuarioLogado, setUsuarioLogado] = useState<any>(undefined);
+    const [tutorialAberto, setTutorialAberto] = useState(false);
+
     const [modalConfiguracoesAberto, setModalConfiguracoesAberto] =
         useState(false);
     const [ameacaParaReportar, setAmeacaParaReportar] =
@@ -100,6 +103,18 @@ function Guardix({ onLogout }: GuardixProps) {
         carregarUsuario();
     }, []);
 
+useEffect(() => {
+    if (!usuarioLogado) return;
+
+    const tutorialVisto = localStorage.getItem(
+        "guardix_tutorial_visto"
+    );
+
+    if (!tutorialVisto) {
+        setTutorialAberto(true);
+    }
+}, [usuarioLogado]);
+
     const navegar = (secao: string) => {
         setSecaoAtiva(secao);
 
@@ -108,6 +123,11 @@ function Guardix({ onLogout }: GuardixProps) {
         }
     };
 
+function fecharTutorial() {
+  localStorage.setItem("guardix_tutorial_visto", "true");
+  setTutorialAberto(false);
+}
+
     return (
         <div className="corpo-dashboard">
             {usuarioLogado?.plano?.toLowerCase() !== "premium+" &&
@@ -115,20 +135,22 @@ function Guardix({ onLogout }: GuardixProps) {
                     <button
                         type="button"
                         className="
-                fixed right-6 top-4 z-[1050]
-                flex items-center gap-2
-                rounded-lg
-                border border-amber-500/40
-                bg-slate-900
-                px-4 py-2
-                text-sm font-semibold
-                text-amber-400
-                shadow-lg
-                transition-all
-                hover:border-amber-400
-                hover:bg-slate-800
-                hover:text-amber-300
-            "
+    fixed right-6 top-4 z-[1050]
+    flex items-center gap-2
+    rounded-lg
+    border border-indigo-500/40
+    bg-indigo-600
+    px-4 py-2
+    text-sm font-semibold
+    text-white
+    shadow-lg shadow-indigo-900/20
+    transition-all duration-200
+    hover:border-indigo-400
+    hover:bg-indigo-700
+    hover:shadow-indigo-900/30
+    focus:outline-none
+    focus:ring-2 focus:ring-indigo-400
+"
                         onClick={() => setSecaoAtiva("planos")}
                     >
                         <i className="fas fa-arrow-up" aria-hidden="true"></i>
@@ -226,11 +248,6 @@ function Guardix({ onLogout }: GuardixProps) {
                 onClose={() => setModalPerfilAberto(false)}
                 usuario={usuarioLogado}
             />
-            <ModalPerfil
-                isOpen={modalPerfilAberto}
-                onClose={() => setModalPerfilAberto(false)}
-                usuario={usuarioLogado}
-            />
 
             <ModalConfiguracoes
                 isOpen={modalConfiguracoesAberto}
@@ -249,6 +266,13 @@ function Guardix({ onLogout }: GuardixProps) {
                 plano={usuarioLogado?.plano || "free"}
                 onNavigateToPlanos={handleNavigateToPlanos}
             />
+
+            <TutorialGuardix
+    aberto={tutorialAberto}
+    onFechar={fecharTutorial}
+    onNavegar={navegar}
+    onMenuAbrir={() => setMenuAberto(true)}
+/>
         </div>
     );
 }

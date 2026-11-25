@@ -134,12 +134,6 @@ function Planos({ onLogout, planoAtual }: PlanosProps) {
 
     return (
         <section className="content-section">
-            <div className="page-header">
-                <h1 className="page-title">Planos Guardix</h1>
-                <p className="page-subtitle">
-                    Escolha o plano ideal para aumentar sua proteção.
-                </p>
-            </div>
 
             {/* PERIODICIDADE */}
             <div className="mt-8 flex justify-center">

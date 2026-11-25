@@ -189,7 +189,7 @@ function Relatorios({
   };
 
   return (
-    <section className="content-section">
+    <section id="secao-relatorios" className="content-section">
 
       {/* HEADER */}
       <div className="page-header">
@@ -321,9 +321,9 @@ function Relatorios({
                   width:
                     totalConsultas > 0
                       ? `${Math.min(
-                          (analisesSeguras / totalConsultas) * 100,
-                          100
-                        )}%`
+                        (analisesSeguras / totalConsultas) * 100,
+                        100
+                      )}%`
                       : "0%",
                 }}
               />
@@ -353,9 +353,9 @@ function Relatorios({
                   width:
                     totalConsultas > 0
                       ? `${Math.min(
-                          (ameacasIdentificadas / totalConsultas) * 100,
-                          100
-                        )}%`
+                        (ameacasIdentificadas / totalConsultas) * 100,
+                        100
+                      )}%`
                       : "0%",
                 }}
               />

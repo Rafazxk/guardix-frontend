@@ -1,4 +1,3 @@
-
 interface HeroLandingProps {
   onAbrirAutenticacao: () => void;
 }
@@ -7,7 +6,7 @@ function HeroLanding({ onAbrirAutenticacao }: HeroLandingProps) {
   return (
     <section
       id="inicio"
-      className="relative isolate overflow-hidden bg-[#101310] text-white"
+      className="relative isolate overflow-hidden bg-[#090909] text-white"
     >
       {/* Textura técnica de fundo */}
       <div
@@ -23,12 +22,12 @@ function HeroLanding({ onAbrirAutenticacao }: HeroLandingProps) {
       <div className="mx-auto grid max-w-7xl items-center gap-14 px-5 py-20 sm:px-8 sm:py-24 lg:grid-cols-[1.05fr_.95fr] lg:gap-16 lg:px-12 lg:py-28">
         {/* Apresentação */}
         <div>
-          <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-lime-300/20 bg-lime-300/[0.06] px-3 py-2">
+          <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/[0.05] px-3 py-2">
             <span
               aria-hidden="true"
-              className="h-2 w-2 rounded-full bg-lime-300"
+              className="h-2 w-2 rounded-full bg-white"
             />
-            <span className="text-xs font-medium tracking-wide text-lime-200">
+            <span className="text-xs font-medium tracking-wide text-white">
               PREVENÇÃO DE FRAUDES DIGITAIS
             </span>
           </div>
@@ -36,7 +35,7 @@ function HeroLanding({ onAbrirAutenticacao }: HeroLandingProps) {
           <h1 className="max-w-2xl text-4xl font-semibold leading-[1.08] tracking-[-0.045em] sm:text-5xl lg:text-7xl">
             Antes de confiar,
             <br />
-            <span className="text-lime-300">verifique.</span>
+            <span className="text-white">verifique.</span>
           </h1>
 
           <p className="mt-7 max-w-xl text-base leading-8 text-neutral-400 sm:text-lg">
@@ -46,18 +45,18 @@ function HeroLanding({ onAbrirAutenticacao }: HeroLandingProps) {
           </p>
 
           <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-            <button
-              type="button"
-              onClick={onAbrirAutenticacao}
-              className="inline-flex min-h-14 items-center justify-center gap-3 rounded-lg bg-lime-300 px-6 font-bold text-[#151812] transition hover:bg-lime-200 focus:outline-none focus:ring-2 focus:ring-lime-300 focus:ring-offset-2 focus:ring-offset-[#101310]"
-            >
-              Começar agora
-              <span aria-hidden="true">↗</span>
-            </button>
+           <button
+  type="button"
+  onClick={onAbrirAutenticacao}
+  className="inline-flex min-h-14 items-center justify-center gap-3 rounded-lg bg-white px-6 font-bold text-black transition hover:bg-neutral-200 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-[#090909]"
+>
+  Acessar o Guardix
+
+</button>
 
             <a
               href="#educativo"
-              className="inline-flex min-h-14 items-center justify-center rounded-lg border border-white/15 px-6 font-medium text-neutral-200 transition hover:border-white/30 hover:bg-white/[0.04]"
+              className="inline-flex min-h-14 items-center justify-center rounded-lg border border-white/20 px-6 font-medium text-white transition hover:border-white/40 hover:bg-white/[0.06]"
             >
               Aprenda a se proteger
             </a>
@@ -65,11 +64,11 @@ function HeroLanding({ onAbrirAutenticacao }: HeroLandingProps) {
 
           <div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-3 border-t border-white/10 pt-6 text-sm text-neutral-500">
             <span className="flex items-center gap-2">
-              <span className="text-lime-300">✓</span>
+              <span className="text-white">✓</span>
               Análise de riscos
             </span>
             <span className="flex items-center gap-2">
-              <span className="text-lime-300">✓</span>
+              <span className="text-white">✓</span>
               Informação preventiva
             </span>
           </div>
@@ -79,10 +78,10 @@ function HeroLanding({ onAbrirAutenticacao }: HeroLandingProps) {
         <div className="relative mx-auto w-full max-w-xl">
           <div
             aria-hidden="true"
-            className="absolute -inset-5 -z-10 rounded-[2rem] bg-lime-300/[0.04] blur-2xl"
+            className="absolute -inset-5 -z-10 rounded-[2rem] bg-white/[0.04] blur-2xl"
           />
 
-          <div className="overflow-hidden rounded-2xl border border-white/10 bg-[#171a16] shadow-2xl shadow-black/30">
+          <div className="overflow-hidden rounded-2xl border border-white/10 bg-[#151515] shadow-2xl shadow-black/30">
             <div className="flex items-center justify-between border-b border-white/10 px-5 py-4">
               <div className="flex items-center gap-3">
                 <div className="flex gap-1.5" aria-hidden="true">
@@ -111,7 +110,7 @@ function HeroLanding({ onAbrirAutenticacao }: HeroLandingProps) {
                   </h2>
                 </div>
 
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-lime-300/20 bg-lime-300/10 text-lime-300">
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-white/20 bg-white/[0.08] text-white">
                   <svg
                     aria-hidden="true"
                     viewBox="0 0 24 24"
@@ -135,7 +134,7 @@ function HeroLanding({ onAbrirAutenticacao }: HeroLandingProps) {
                 </div>
               </div>
 
-              <div className="mt-7 rounded-xl border border-white/10 bg-black/20 p-4">
+              <div className="mt-7 rounded-xl border border-white/10 bg-black/30 p-4">
                 <p className="text-[11px] uppercase tracking-[0.16em] text-neutral-500">
                   Endereço ilustrativo
                 </p>
@@ -144,9 +143,9 @@ function HeroLanding({ onAbrirAutenticacao }: HeroLandingProps) {
                 </p>
               </div>
 
-              <div className="mt-5 rounded-xl border border-lime-300/15 bg-lime-300/[0.04] p-4">
+              <div className="mt-5 rounded-xl border border-white/15 bg-white/[0.04] p-4">
                 <div className="flex items-center gap-3">
-                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-lime-300/10 text-lime-300">
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white/[0.08] text-white">
                     <svg
                       aria-hidden="true"
                       viewBox="0 0 24 24"

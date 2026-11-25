@@ -5,7 +5,7 @@ interface Usuario {
     plano: string;
     is_admin?: boolean;
 }
-    
+
 interface SidebarProps {
     menuAberto: boolean;
     setMenuAberto: React.Dispatch<React.SetStateAction<boolean>>;
@@ -19,7 +19,7 @@ interface SidebarProps {
 }
 
 function Sidebar({
-     menuAberto,
+    menuAberto,
     setMenuAberto,
     secaoAtiva,
     navegar,
@@ -32,7 +32,7 @@ function Sidebar({
 
     const alternarMenu = () => {
         setMenuAberto((prev) => !prev);
-    };  
+    };
 
     const fazerLogout = () => {
         localStorage.removeItem("guardix_token");
@@ -103,7 +103,8 @@ function Sidebar({
                     PAINEL
                 </p>
 
-                <a
+                <a  
+                    id="tutorial-verificador"
                     href="#"
                     className={`${itemBase} ${secaoAtiva === "verificador" ? itemAtivo : ""}`}
                     onClick={(e) => {
@@ -116,6 +117,7 @@ function Sidebar({
                 </a>
 
                 <a
+                    id="secao-historico"
                     href="#"
                     className={`${itemBase} ${secaoAtiva === "historico" ? itemAtivo : ""}`}
                     onClick={(e) => {
@@ -128,6 +130,7 @@ function Sidebar({
                 </a>
 
                 <a
+                    id="feed-golpes"
                     href="#"
                     className={`${itemBase} ${secaoAtiva === "feed" ? itemAtivo : ""}`}
                     onClick={(e) => {
@@ -144,6 +147,7 @@ function Sidebar({
                 </a>
 
                 <a
+                    id="secao-relatorios"
                     href="#"
                     className={`${itemBase} ${secaoAtiva === "relatorios" ? itemAtivo : ""}`}
                     onClick={(e) => {
@@ -156,36 +160,38 @@ function Sidebar({
                 </a>
 
                 <a
+                    id="tutorial-denunciar"
                     href="#"
                     className={itemBase}
                     onClick={(e) => {
-    e.preventDefault();
-    abrirModalReporte();
+                        e.preventDefault();
+                        abrirModalReporte();
 
-    if (window.innerWidth < 768) {
-        setMenuAberto(false);
-    }
-}}
+                        if (window.innerWidth < 768) {
+                            setMenuAberto(false);
+                        }
+                    }}
                 >
                     <i className="fas fa-triangle-exclamation w-4 text-center"></i>
                     <span>Denunciar Golpe</span>
                 </a>
-            
-            <a
-                href="#"
-                className={`${itemBase} ${secaoAtiva === "planos" ? itemAtivo : ""}`}
-                onClick={(e) => {
-    e.preventDefault();
-    navegar("planos");
 
-    if (window.innerWidth < 768) {
-        setMenuAberto(false);
-    }
-}}
-            >
-                <i className="fas fa-star"></i>
-                <span>Acessar Planos</span>
-            </a>
+                <a  
+                    id="tutorial-planos"
+                    href="#"
+                    className={`${itemBase} ${secaoAtiva === "planos" ? itemAtivo : ""}`}
+                    onClick={(e) => {
+                        e.preventDefault();
+                        navegar("planos");
+
+                        if (window.innerWidth < 768) {
+                            setMenuAberto(false);
+                        }
+                    }}
+                >
+                    <i className="fas fa-star"></i>
+                    <span>Acessar Planos</span>
+                </a>
                 {usuario?.is_admin && (
                     <a
                         href="#"
@@ -203,32 +209,34 @@ function Sidebar({
                         <span>Administração</span>
                     </a>
 
-                    
+
                 )}
 
-           <a
-    href="#"
-    className={itemBase}
-    onClick={(e) => {
-        e.preventDefault();
-        abrirModalConfiguracoes();
+                <a  
+                    id="tutorial-configuracoes"
+                    href="#"
+                    className={itemBase}
+                    onClick={(e) => {
+                        e.preventDefault();
+                        abrirModalConfiguracoes();
 
-        if (window.innerWidth < 768) {
-            setMenuAberto(false);
-        }
-    }}
->
-    <i className="fas fa-gear w-4 text-center" />
-    <span>Configurações</span>
-</a>
-         </nav>
-         
+                        if (window.innerWidth < 768) {
+                            setMenuAberto(false);
+                        }
+                    }}
+                >
+                    <i className="fas fa-gear w-4 text-center" />
+                    <span>Configurações</span>
+                </a>
+            </nav>
+
             {/* RODAPÉ DO USUÁRIO */}
             <div className="shrink-0 flex items-center gap-3 border-t border-[var(--border)] px-3 pt-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
-                <button
-    type="button"
-    onClick={abrirModalPerfil}
-    className="
+                <button 
+                    id="tutorial-perfil"
+                    type="button"
+                    onClick={abrirModalPerfil}
+                    className="
         flex min-w-0 flex-1 items-center gap-2.5
         rounded-xl p-2 text-left
         transition-colors
@@ -236,45 +244,45 @@ function Sidebar({
         focus-visible:outline-none
         focus-visible:ring-2 focus-visible:ring-indigo-500
     "
-    aria-label="Abrir meu perfil"
-    title="Ver perfil"
->
-    <div className="
+                    aria-label="Abrir meu perfil"
+                    title="Ver perfil"
+                >
+                    <div className="
         flex h-10 w-10 shrink-0 items-center justify-center
         rounded-full border border-indigo-400/30
         bg-gradient-to-br from-indigo-500 to-purple-600
         font-mono text-sm font-bold text-white
     ">
-        {inicialAvatar}
-    </div>
+                        {inicialAvatar}
+                    </div>
 
-    <div className="min-w-0 flex-1">
-        <p
-            className="
+                    <div className="min-w-0 flex-1">
+                        <p
+                            className="
                 overflow-hidden text-ellipsis whitespace-nowrap
                 text-sm font-semibold text-[var(--sidebar-text-strong)]
             "
-            title={nomeExibido}
-        >
-            {nomeExibido}
-        </p>
+                            title={nomeExibido}
+                        >
+                            {nomeExibido}
+                        </p>
 
-        <span className="
+                        <span className="
             block overflow-hidden text-ellipsis whitespace-nowrap
             text-[0.7rem] text-[var(--sidebar-text)]
         ">
-            {planoExibido}
-        </span>
+                            {planoExibido}
+                        </span>
 
-        <span className="
+                        <span className="
             mt-0.5 block text-[0.65rem] text-indigo-400
         ">
-            Ver meu perfil
-        </span>
-    </div>
+                            Ver meu perfil
+                        </span>
+                    </div>
 
-    <i className="fas fa-chevron-right shrink-0 text-xs text-[var(--sidebar-muted)]" />
-</button>
+                    <i className="fas fa-chevron-right shrink-0 text-xs text-[var(--sidebar-muted)]" />
+                </button>
 
                 <button
                     type="button"

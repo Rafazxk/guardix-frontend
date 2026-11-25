@@ -7,7 +7,7 @@ function CabecalhoLanding({
   onAbrirAutenticacao,
 }: CabecalhoLandingProps) {
   return (
-    <header className="sticky top-0 z-50 border-b border-white/10 bg-[#101310]/95 backdrop-blur-md">
+    <header className="sticky top-0 z-50 border-b border-white/10 bg-[#090909]/95 backdrop-blur-md">
       <nav
         aria-label="Navegação principal"
         className="mx-auto flex min-h-[76px] max-w-7xl items-center justify-between gap-4 px-5 sm:px-8 lg:px-12"
@@ -17,7 +17,7 @@ function CabecalhoLanding({
           aria-label="Guardix — página inicial"
           className="group flex items-center gap-3"
         >
-          <span className="flex h-10 w-10 items-center justify-center rounded-xl border border-lime-300/30 bg-lime-300/10 text-lime-300 transition-colors group-hover:bg-lime-300/20">
+          <span className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/20 bg-white/[0.06] text-white transition-colors group-hover:bg-white/[0.12]">
             <svg
               aria-hidden="true"
               viewBox="0 0 24 24"
@@ -42,7 +42,7 @@ function CabecalhoLanding({
 
           <span className="flex flex-col">
             <span className="text-xl font-bold tracking-tight text-white">
-              guardix<span className="text-lime-300">.</span>
+              guardix<span className="text-neutral-400">.</span>
             </span>
             <span className="text-[10px] uppercase tracking-[0.2em] text-neutral-500">
               Segurança digital
@@ -68,7 +68,7 @@ function CabecalhoLanding({
         <button
           type="button"
           onClick={onAbrirAutenticacao}
-          className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-lime-300 px-4 py-2 text-sm font-bold text-[#151812] transition-colors hover:bg-lime-200 focus:outline-none focus:ring-2 focus:ring-lime-300 focus:ring-offset-2 focus:ring-offset-[#101310] sm:px-5"
+          className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-white px-4 py-2 text-sm font-bold text-black transition-colors hover:bg-neutral-200 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-[#090909] sm:px-5"
         >
           Entrar
           <svg

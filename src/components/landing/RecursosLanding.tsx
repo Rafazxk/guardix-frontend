@@ -101,12 +101,12 @@ function RecursosLanding() {
     <>
       <section
         id="recursos"
-        className="border-t border-white/[0.07] bg-[#151814] text-white"
+        className="border-t border-white/[0.07] bg-[#111111] text-white"
       >
         <div className="mx-auto max-w-7xl px-5 py-20 sm:px-8 sm:py-24 lg:px-12">
           <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
             <div>
-              <p className="text-xs font-semibold tracking-[0.22em] text-lime-300">
+              <p className="text-xs font-semibold tracking-[0.22em] text-white">
                 O QUE O GUARDIX FAZ
               </p>
 
@@ -120,7 +120,7 @@ function RecursosLanding() {
                 antes de confiar em uma informação.
               </p>
 
-              <div className="mt-8 flex items-center gap-3 border-l-2 border-lime-300/60 py-2 pl-4">
+              <div className="mt-8 flex items-center gap-3 border-l-2 border-white/60 py-2 pl-4">
                 <span className="text-sm leading-6 text-neutral-300">
                   A análise auxilia sua avaliação. Na dúvida, confirme a
                   informação diretamente com o canal oficial.
@@ -134,7 +134,7 @@ function RecursosLanding() {
                   key={recurso.numero}
                   className="group grid gap-4 py-6 transition-colors sm:grid-cols-[48px_1fr] sm:gap-5 sm:py-7"
                 >
-                  <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 text-lime-300 transition-colors group-hover:border-lime-300/30 group-hover:bg-lime-300/[0.06]">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 text-white transition-colors group-hover:border-white/30 group-hover:bg-white/[0.06]">
                     {recurso.icone}
                   </div>
 
@@ -143,7 +143,7 @@ function RecursosLanding() {
                       <span className="font-mono text-xs text-neutral-600">
                         {recurso.numero}
                       </span>
-                      <span className="text-[10px] font-semibold tracking-[0.18em] text-lime-300/80">
+                      <span className="text-[10px] font-semibold tracking-[0.18em] text-neutral-400">
                         {recurso.categoria}
                       </span>
                     </div>
@@ -165,11 +165,11 @@ function RecursosLanding() {
 
       <section
         id="educativo"
-        className="border-t border-white/[0.07] bg-[#101310] text-white"
+        className="border-t border-white/[0.07] bg-[#090909] text-white"
       >
         <div className="mx-auto grid max-w-7xl gap-10 px-5 py-16 sm:px-8 sm:py-20 lg:grid-cols-[1fr_1fr] lg:items-center lg:px-12">
           <div>
-            <p className="text-xs font-semibold tracking-[0.22em] text-lime-300">
+            <p className="text-xs font-semibold tracking-[0.22em] text-white">
               CONHECIMENTO TAMBÉM PROTEGE
             </p>
 
@@ -186,7 +186,9 @@ function RecursosLanding() {
 
           <div className="space-y-0">
             <article className="border-t border-white/10 py-5">
-              <p className="font-mono text-xs text-lime-300">01 / PHISHING</p>
+              <p className="font-mono text-xs text-neutral-400">
+                01 / PHISHING
+              </p>
               <h3 className="mt-2 font-semibold text-white">
                 Mensagens que imitam empresas
               </h3>
@@ -197,7 +199,9 @@ function RecursosLanding() {
             </article>
 
             <article className="border-t border-white/10 py-5">
-              <p className="font-mono text-xs text-lime-300">02 / COMPROVANTES</p>
+              <p className="font-mono text-xs text-neutral-400">
+                02 / COMPROVANTES
+              </p>
               <h3 className="mt-2 font-semibold text-white">
                 Imagens não comprovam pagamento
               </h3>
@@ -208,7 +212,9 @@ function RecursosLanding() {
             </article>
 
             <article className="border-y border-white/10 py-5">
-              <p className="font-mono text-xs text-lime-300">03 / ENGENHARIA SOCIAL</p>
+              <p className="font-mono text-xs text-neutral-400">
+                03 / ENGENHARIA SOCIAL
+              </p>
               <h3 className="mt-2 font-semibold text-white">
                 Pressa e pressão são sinais de alerta
               </h3>
