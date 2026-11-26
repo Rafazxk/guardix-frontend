@@ -63,6 +63,22 @@ function Sidebar({
     `;
 
     return (
+        <>
+
+          {menuAberto && (
+            <button
+                type="button"
+                aria-label="Fechar menu"
+                onClick={() => setMenuAberto(false)}
+                className="
+                    fixed inset-0 z-[990]
+                    bg-black/60
+                    backdrop-blur-[2px]
+                    md:hidden
+                "
+            />
+        )}
+
         <aside
             className={`
                 fixed left-0 top-0 z-[1000]
@@ -295,6 +311,7 @@ function Sidebar({
                 </button>
             </div>
         </aside>
+        </>
     );
 }
 
