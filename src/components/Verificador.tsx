@@ -304,7 +304,7 @@ function Verificador({
     const dashOffsetCalculado = comprimentoMaximo - (comprimentoMaximo * score) / 100;
 
     return (
-        <section id="secao-verificador" className="content-section active">
+        <section  id="secao-verificador" className="content-section active">
             <div className="page-header">
                 <div>
                     <h1 className="page-title">Verificador</h1>

@@ -16,6 +16,7 @@ interface SidebarProps {
     abrirModalPerfil: () => void;
     usuario?: Usuario;
     abrirModalConfiguracoes: () => void;
+    abrirTutorial: () => void;
 }
 
 function Sidebar({
@@ -26,6 +27,7 @@ function Sidebar({
     abrirModalReporte,
     abrirModalPerfil,
     abrirModalConfiguracoes,
+    abrirTutorial,
     usuario,
 }: SidebarProps) {
 
@@ -113,6 +115,7 @@ function Sidebar({
                 </div>
             </div>
 
+                
             {/* NAVEGAÇÃO */}
             <nav className="flex flex-1 flex-col gap-0.5 overflow-y-auto px-3 py-4">
                 <p className="px-2 py-2 pb-1 font-mono text-[0.65rem] font-bold tracking-[0.12em] text-[var(--sidebar-muted)]">
@@ -245,6 +248,42 @@ function Sidebar({
                     <span>Configurações</span>
                 </a>
             </nav>
+
+{/* AJUDA E TUTORIAL */}
+<div className="shrink-0 border-t border-[var(--border)] px-3 py-3">
+    <button
+        id="botao-ajuda-tutorial"
+        type="button"
+        onClick={abrirTutorial}
+        className="
+            group flex w-full items-center gap-3
+            rounded-xl border border-indigo-500/20
+            bg-indigo-500/5 p-3 text-left
+            transition-all duration-200
+            hover:border-indigo-500/40
+            hover:bg-indigo-500/10
+        "
+    >
+        <div className="
+            flex h-10 w-10 shrink-0 items-center justify-center
+            rounded-lg bg-indigo-500/10 text-indigo-400
+        ">
+            <i className="fas fa-circle-question text-lg" />
+        </div>
+
+        <div className="min-w-0 flex-1">
+            <p className="text-sm font-semibold text-[var(--sidebar-text-strong)]">
+                Precisa de ajuda?
+            </p>
+
+            <p className="mt-0.5 text-xs text-[var(--sidebar-muted)]">
+                Acesse o tutorial do Guardix
+            </p>
+        </div>
+
+        <i className="fas fa-chevron-right text-xs text-[var(--sidebar-muted)]" />
+    </button>
+</div>
 
             {/* RODAPÉ DO USUÁRIO */}
             <div className="shrink-0 flex items-center gap-3 border-t border-[var(--border)] px-3 pt-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">

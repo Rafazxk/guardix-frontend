@@ -123,6 +123,12 @@ useEffect(() => {
         }
     };
 
+const iniciarTutorial = () => {
+    setMenuAberto(false);
+    navegar("verificador");
+    setTutorialAberto(true);
+};
+
 function fecharTutorial() {
   localStorage.setItem("guardix_tutorial_visto", "true");
   setTutorialAberto(false);
@@ -158,7 +164,10 @@ function fecharTutorial() {
                             ? "Conheça o Premium+"
                             : "Atualize seu plano"}
                     </button>
+
+                    
                 )}
+
             <button
                 type="button"
                 onClick={() => setMenuAberto(true)}
@@ -190,6 +199,7 @@ function fecharTutorial() {
                 abrirModalReporte={() => setModalReporteAberto(true)}
                 abrirModalPerfil={() => setModalPerfilAberto(true)}
                 abrirModalConfiguracoes={() => setModalConfiguracoesAberto(true)}
+                abrirTutorial={iniciarTutorial}
             />
 
             <main className="main-content">
